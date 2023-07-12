@@ -1,4 +1,4 @@
-# Tema - Análise dados da Segurança Pública do Estado do Rio de Janeiro
+# Análise dados da Segurança Pública do Estado do Rio de Janeiro
 
 - Dados extraidos nesse *[link](https://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv-)*
 
