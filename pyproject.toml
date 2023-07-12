@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "aed-dados-seguranca-publica"
+version = "0.1.0"
+description = ""
+authors = ["Prog-LucasAlves <lucasalves_taz@hotmail.com>"]
+readme = "README.md"
+packages = [{include = "aed_dados_seguranca_publica"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
