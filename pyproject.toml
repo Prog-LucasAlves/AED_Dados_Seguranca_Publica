@@ -8,6 +8,8 @@ packages = [{include = "aed_dados_seguranca_publica"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+pandas = "^2.0.3"
+openpyxl = "^3.1.2"
 
 
 [tool.poetry.group.dev.dependencies]

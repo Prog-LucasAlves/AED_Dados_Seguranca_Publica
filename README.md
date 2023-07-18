@@ -1,6 +1,7 @@
 # Análise dados da Segurança Pública do Estado do Rio de Janeiro
 
 - Dados extraidos nesse *[link](https://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv-)*
+- Dados já baixados estão na pasta *[data]()*
 - Dicionário dos dados esta na pasta *[data]()*
 
 ## Objetivo
