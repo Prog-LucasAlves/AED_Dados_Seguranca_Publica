@@ -7,5 +7,6 @@
 ## Objetivo
 
 1. Filtrar e analisar os dados do município de Petrópolis.
+0 Dados analisados de 2021 e 2022
 
 ---  
