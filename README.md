@@ -23,7 +23,7 @@
     - Perguntas:
     01. Quantidade de municípios. [R1](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R01)
 
-    02. Nome dos municípios. [R2](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/db_dados)
+    02. Nome dos municípios. [R2](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R02)
 
     frequencia absoluta e relativa
 
