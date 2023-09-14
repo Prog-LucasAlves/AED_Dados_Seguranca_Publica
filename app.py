@@ -25,4 +25,4 @@ map = folium.Map(
     tiles='CartoDB positron')
 
 # call to render Folium map in Streamlit
-st_data = st_folium(map, width=400, height=50)
+st_data = st_folium(map, width=400, height=350)
