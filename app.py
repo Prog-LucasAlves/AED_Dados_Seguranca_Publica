@@ -19,7 +19,7 @@ st.set_page_config(
 st.title('APP Em Construção')
 
 map = folium.Map(
-    location=[22.541001, 43.1227], 
+    location=[23.0024,  44.1905], 
     zoom_start=4, 
     scrollWheelZoom=False, 
     tiles='CartoDB positron')
