@@ -10,17 +10,21 @@
 
 - Dados já baixados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_dados)*
 
-- Dicionário dos dados esta na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_dados)*
+- Dicionário dos dados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_dados)*
 
-- Dados em formato .db *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/db_dados)*
+- Dados em formato .db estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/db_dados)* - nome da tabela: **data**
 
-## ![C](https://cdn-icons-png.flaticon.com/24/7508/7508991.png) Testes
+## ![C](https://cdn-icons-png.flaticon.com/24/7508/7508991.png) Testes 🚧
 
-## Objetivo
+## ![D](https://cdn-icons-png.flaticon.com/24/977/977451.png) Objetivo
 
 1. Filtrar e analisar os dados do estado do Rio de Janeiro com SQL.
 
     - Perguntas:
-    1. Quantidade
+    01. Quantidade de municípios. [1](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/db_dados)
+
+    02. Nome dos municípios. [2](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/db_dados)
+
+    frequencia absoluta e relativa
 
 2. Criar app utilizando o streamlit
