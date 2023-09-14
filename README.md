@@ -28,3 +28,5 @@
     frequencia absoluta e relativa
 
 2. Criar app utilizando o streamlit
+
+    - [APP](https://dadossegurancapublicarj.streamlit.app/)
