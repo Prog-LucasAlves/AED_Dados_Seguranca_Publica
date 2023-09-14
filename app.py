@@ -19,10 +19,10 @@ st.set_page_config(
 st.title('APP Em Construção')
 
 map = folium.Map(
-    location=[38, -96.5], 
+    location=[22,54, -43,13], 
     zoom_start=4, 
     scrollWheelZoom=False, 
     tiles='CartoDB positron')
 
 # call to render Folium map in Streamlit
-st_data = st_folium(map, width=200)
+st_data = st_folium(map, width=700, height=450)
