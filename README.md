@@ -27,8 +27,12 @@
 
     03. Nome das regiões. [R3](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R03)
 
-    04. Quantidade de Homicídios dolosos por data e município ()(20 +). [R4](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R04)
+    04. Quantidade de Homicídios dolosos por data(ano)(Ordenado por *Ano* ). [R4](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R04)
 
 2. Criar app utilizando o streamlit
 
     - [APP](https://dadossegurancapublicarj.streamlit.app/)
+
+3. Documentação
+
+    - [DOc](...)
