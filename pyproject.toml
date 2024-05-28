@@ -4,21 +4,15 @@ version = "0.1.0"
 description = ""
 authors = ["Prog-LucasAlves <lucasalves_taz@hotmail.com>"]
 readme = "README.md"
-packages = [{include = "aed_dados_seguranca_publica"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pandas = "^2.0.3"
+pandas = "^2.2.1"
 openpyxl = "^3.1.2"
-ipython-sql = "^0.5.0"
-pytest = "^7.4.1"
-requests = "^2.31.0"
-streamlit = "^1.26.0"
-streamlit-folium = "^0.13.0"
 
 
 [tool.poetry.group.dev.dependencies]
-ipykernel = "^6.24.0"
+ipykernel = "^6.29.3"
 
 [build-system]
 requires = ["poetry-core"]

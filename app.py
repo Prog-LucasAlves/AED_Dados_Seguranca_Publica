@@ -6,7 +6,7 @@ import folium
 img = Image.open('./image/4744315.png')
 
 st.set_page_config(
-    page_title='Em Construção', 
+    page_title='Em Construção',
     page_icon=img,
     layout="wide",
     initial_sidebar_state="expanded",
@@ -19,9 +19,9 @@ st.set_page_config(
 st.title('APP Em Construção')
 
 map = folium.Map(
-    location=[-22.9035, -43.2096], 
-    zoom_start=4, 
-    scrollWheelZoom=False, 
+    location=[-22.9035, -43.2096],
+    zoom_start=4,
+    scrollWheelZoom=False,
     tiles='CartoDB positron')
 
 # call to render Folium map in Streamlit
