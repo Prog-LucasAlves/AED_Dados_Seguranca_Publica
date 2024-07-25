@@ -14,9 +14,7 @@
 
 - Dados em formato .db estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/db_dados)* - nome da tabela: **data**
 
-## ![C](https://cdn-icons-png.flaticon.com/24/7508/7508991.png) Testes 🚧
-
-## ![D](https://cdn-icons-png.flaticon.com/24/977/977451.png) Objetivo
+## ![C](https://cdn-icons-png.flaticon.com/24/977/977451.png) Objetivo
 
 1. Filtrar e analisar os dados do estado do Rio de Janeiro com SQL.
 
@@ -27,4 +25,4 @@
 
     03. Nome das regiões. [R3](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R03)
 
-    04. Quantidade de Homicídios dolosos por data(ano)(Ordenado por *Ano* ). [R4](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R04)
+    04. Quantidade de Homicídios dolosos por data(ano)(Ordenado por **Ano** ). [R4](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R04)
