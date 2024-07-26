@@ -8,21 +8,15 @@
 
 - Dados extraidos nesse *[link](https://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv)*
 
-- Dados já baixados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_dados)*
+- Dados já baixados estão na pasta(.parquet) *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_dados)*
 
 - Dicionário dos dados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_dados)*
 
-- Dados em formato .db estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/db_dados)* - nome da tabela: **data**
+## ![C]() Objetivo
 
-## ![C](https://cdn-icons-png.flaticon.com/24/977/977451.png) Objetivo
+- Coletar os dados
+- Limpar os dados
+- Analisar os dados através de um dashboard
 
-1. Filtrar e analisar os dados do estado do Rio de Janeiro com SQL.
-
-    - Perguntas:
-    01. Quantidade de municípios. [R1](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R01)
-
-    02. Nome dos municípios. [R2](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R02)
-
-    03. Nome das regiões. [R3](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R03)
-
-    04. Quantidade de Homicídios dolosos por data(ano)(Ordenado por **Ano** ). [R4](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/SQL/Respostas%20SQL/R04)
+## ![D]() Tecnologias utilizadas
+https://ispconecta.rj.gov.br/serie_historica/
