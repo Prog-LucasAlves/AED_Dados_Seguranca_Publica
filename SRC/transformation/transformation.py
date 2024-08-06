@@ -28,8 +28,9 @@ def transformardados():
     dados.loc[dados["mes"] == 10, "mes_nome"] = "Outubro"
     dados.loc[dados["mes"] == 11, "mes_nome"] = "Novembro"
     dados.loc[dados["mes"] == 12, "mes_nome"] = "Dezembro"
-    # Salvando os dados transformados
+    # Local onde serão salvos os dados transformados
     path = "../../data/raw_data/GOLDEN/"
+    # Salvando os dados transformados
     dados.to_parquet(f"{path}GOLDEN_data.parquet", index=False)
 
 
