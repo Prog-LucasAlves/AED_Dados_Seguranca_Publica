@@ -8,16 +8,16 @@
 
 - Dados extraidos nesse *[link](https://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv)*
 
-- Dados já baixados estão na pasta(.parquet) *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_dados)*
+- Dados já baixados estão na pasta(.parquet) *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_data/GOLDEN)*
 
-- Dicionário dos dados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_dados)*
+- Dicionário dos dados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_data)*
 
-## ![C](...) Objetivo
+## ![C](https://cdn-icons-png.flaticon.com/24/1534/1534999.png) Objetivo
 
-- Coletar os dados
-- Limpar os dados
-- Analisar os dados através de um dashboard
+- [x] Coletar os dados
+- [x] Limpar os dados
+- [ ] Analisar os dados através de um dashboard
 
-## ![D](...) Tecnologias utilizadas
+## ![D](https://cdn-icons-png.flaticon.com/24/752/752646.png) Tecnologias utilizadas
 
 https://ispconecta.rj.gov.br/serie_historica/
