@@ -12,11 +12,12 @@
 
 - Dicionário dos dados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_dados)*
 
-## ![C]() Objetivo
+## ![C](...) Objetivo
 
 - Coletar os dados
 - Limpar os dados
 - Analisar os dados através de um dashboard
 
-## ![D]() Tecnologias utilizadas
+## ![D](...) Tecnologias utilizadas
+
 https://ispconecta.rj.gov.br/serie_historica/
