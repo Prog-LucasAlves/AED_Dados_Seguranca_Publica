@@ -25,7 +25,7 @@ def loaddata():
     con = duckdb.connect()
     data = con.execute(
         "SELECT * FROM read_parquet('./data/raw_data/GOLDEN/GOLDEN_data.parquet')"
-    ).to_df()
+    ).df()
     con.close()
     return data
 
