@@ -1,6 +1,10 @@
+# Bibliotecas utilizadas
 import streamlit as st
 from PIL import Image
+import duckdb
 
+# Configurações da página
+st.set_option("deprecation.showfileUploaderEncoding", False)
 img = Image.open("./image/4744315.png")
 
 st.set_page_config(
@@ -15,4 +19,25 @@ st.set_page_config(
     },
 )
 
-st.title("APP Em Construção")
+
+# Leitura dos dados
+def loaddata():
+    con = duckdb.connect()
+    data = con.execute(
+        "SELECT * FROM read_parquet('./data/raw_data/GOLDEN/GOLDEN_data.parquet')"
+    ).to_df()
+    con.close()
+    return data
+
+
+# Visualização dos dados
+def showdata():
+    st.title("Dados da Segurança Pública do Estado do Rio de Janeiro")
+    # Carregando os dados
+    data = loaddata()
+    # Mostrando os dados
+    st.dataframe(data)
+
+
+if __name__ == "__main__":
+    showdata()
