@@ -20,7 +20,7 @@
 
 ## ![D](https://cdn-icons-png.flaticon.com/24/752/752646.png) Tecnologias utilizadas
 
-## ![E](https://cdn-icons-png.flaticon.com/512/1991/1991103.png) DashBoard
+## ![E](https://cdn-icons-png.flaticon.com/24/1991/1991103.png) DashBoard
 
 - [link](https://aed-dados-seguranca-publica.onrender.com)
 
