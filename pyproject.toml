@@ -13,12 +13,18 @@ pyarrow = "^17.0.0"
 fastparquet = "^2024.5.0"
 streamlit = "^1.37.1"
 duckdb = "^1.0.0"
+folium = "^0.17.0"
+streamlit-folium = "^0.22.0"
 
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.3"
 pre-commit = "^3.7.1"
+taskipy = "^1.13.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+run = "streamlit run app.py"
