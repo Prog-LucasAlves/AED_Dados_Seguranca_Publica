@@ -4,7 +4,7 @@ import pandas as pd
 # Criando dicionário com a colunas
 tipo_ocorrencia = {"hom_doloso": "Homicídio doloso"}
 
-# Transformando em um dataframe
+# Transformando em um dataframe e resetando o index
 tipo_ocorrencia = pd.DataFrame.from_dict(tipo_ocorrencia, orient="index").reset_index()
 
 # Renomeando as colunas
