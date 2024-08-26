@@ -19,8 +19,8 @@ body:
       multiple: false
       options:
         - 🥇Ótimo
-        - 🥈Bom
+        - 🥈B
         - 🥉Regular
-        - 🏅Ruim  
+        - 🏅Ruim
     validations:
       required: true
