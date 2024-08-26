@@ -1,10 +1,11 @@
 # Bibliotecas utilizadas
-# import folium.map
+import folium.map
 import streamlit as st
 from PIL import Image
 import duckdb
-# import folium
-# from streamlit_folium import st_folium
+import folium
+from streamlit_folium import st_folium
+from branca.colormap import linear
 
 # Configurações da página
 img = Image.open("./image/4744315.png")
@@ -35,7 +36,7 @@ title = """
 st.markdown(title, unsafe_allow_html=True)
 
 # Colunas do dashboard
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns((1, 1, 1))
 
 with col1:
     # Carregando as datas(ano)
@@ -62,28 +63,49 @@ with col3:
         WHERE descricao = '{titulo}'"""
     ).to_df()
     titulo_ocorrencia = titulo_ocorrencia.iloc[0, 0]
-    st.markdown("TOTAL DE OCORRÊNCIAS")
 
-    total_titulo_df = duckdb.query(
-        f"""SELECT SUM({titulo_ocorrencia})
-        FROM '{path_parquet}'"""
-    ).to_df()
-    total_titulo_df = total_titulo_df.iloc[0, 0]
-    total_titulo = st.markdown(f"{total_titulo_df:.0f}")
+# Criando informação com o total de ocorrencias por município no mapa
+total_titulo_map = duckdb.query(
+    f"""SELECT ano, fmun, fmun_cod, SUM({titulo_ocorrencia})
+    FROM '{path_parquet}'
+    WHERE ano = '{ano}'
+    GROUP BY ano, fmun, fmun_cod
+    """
+).to_df()
+
+total_titulo_map.columns = ["Ano", "Município", "Município_cod", "Total"]
+total_titulo_map["Município_cod"] = total_titulo_map["Município_cod"].astype(str)
+total_titulo_map_index = total_titulo_map.set_index("Município_cod")["Total"]
+
 
 # Criando Mapa
 path_mapa = "./data/map/geojs-33-mun.json"
 
-# m = folium.Map(location=([-22.42, -42.48]), zoom_start=7)
+colormap = linear.YlGn_09.scale(
+    total_titulo_map["Total"].min(), total_titulo_map["Total"].max()
+)
 
-# style = lambda x: {"color": "#000000", "fillOpacity": 0, "weight": 1}
+color_dict = {
+    key: colormap(total_titulo_map_index[key]) for key in total_titulo_map_index.keys()
+}
 
-# folium.GeoJson(path_mapa, style_function=style).add_to(m)
+m = folium.Map(location=([-22.42, -42.48]), zoom_start=7)
 
-# st_folium(m, height=350, width=790)
+folium.GeoJson(
+    path_mapa,
+    name="geojson",
+    zoom_on_click=True,
+    style_function=lambda feature: {
+        "fillColor": color_dict[feature["id"]],
+        "color": "black",
+        "weight": 0.3,
+        "fillOpacity": 0.5,
+    },
+).add_to(m)
 
-"""
-folium.Choropleth(
-    geo_data=d).add_to(m)
-st_map = st_folium(m, height=350, width=750)
-"""
+colormap.caption = ""
+colormap.add_to(m)
+
+st_folium(m, height=350, width=790)
+
+folium.LayerControl().add_to(m)
