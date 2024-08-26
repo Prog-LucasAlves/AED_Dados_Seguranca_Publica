@@ -19,7 +19,7 @@ body:
       multiple: false
       options:
         - 🥇Ótimo
-        - 🥈B
+        - 🥈Bom
         - 🥉Regular
         - 🏅Ruim
     validations:
