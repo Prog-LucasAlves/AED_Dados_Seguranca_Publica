@@ -16,7 +16,7 @@ O objetivo desse projeto é **analisar** os dados de segurança pública do esta
 2. Filtro das ocorrências registradas por **município** | Barra lateral.
 3. Filtro das ocorrências registradas por **região**.
 
-![D](D:/Prjts\AED_Dados_Seguranca_Publica\image\Preview.png)
+![D](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/blob/main/image/Preview.png)
 
 ## ![E](https://cdn-icons-png.flaticon.com/24/9872/9872417.png) Dados
 
