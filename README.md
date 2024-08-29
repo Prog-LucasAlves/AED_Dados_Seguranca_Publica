@@ -1,4 +1,4 @@
-<p style="font-family: times, serif; font-size:40pt; font-style:italic"> Análise de dados da Segurança Pública do Estado do Rio de Janeiro </p>
+<font size=130> Análise de dados da Segurança Pública do Estado do Rio de Janeiro </font>
 
 ## ![A](https://cdn-icons-png.flaticon.com/24/1085/1085456.png) ISP (Instituto de Segurança Pública)
 
