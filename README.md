@@ -20,22 +20,24 @@ O objetivo desse projeto é **analisar** os dados de segurança pública do esta
 
 ## ![E](https://cdn-icons-png.flaticon.com/24/9872/9872417.png) Dados
 
-- Dados extraidos nesse *[link](https://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv)*
+- Dados extraidos nesse *[link](https://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv).*
 
-- Dados já baixados estão nesta pasta(arquivo .parquet) *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_data/GOLDEN)*
+- Dados já baixados estão nesta pasta(arquivo .parquet) *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_data/GOLDEN).*
 
-- Dicionário dos dados estão nesta pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_data)*
+- Dicionário dos dados estão nesta pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_data).*
 
 ## ![F](https://cdn-icons-png.flaticon.com/24/752/752646.png) Tecnologias utilizadas
 
-- Python
+- Python: Linguagem de programação principal.
+- Poetry: Gerenciador de dependências e ambientes virtuais para o Python.
+- Pandas: Manipulação e análise de dados.
+- Streamlit: Framework desenvolvido em Python que torna possível a visualização de dados para uma simples análise exploratória de um dataset.
 
-## ![E](https://cdn-icons-png.flaticon.com/24/1991/1991103.png) DashBoard
+> [!IMPORTANTE]
+> Render: Plataforma para realizar o Deploy(Dashboard).[Link](https://render.com/).
+
+## ![G](https://cdn-icons-png.flaticon.com/24/1991/1991103.png) Dashboard
 
 - [link](https://aed-dados-seguranca-publica.onrender.com)
 
-https://ispconecta.rj.gov.br/serie_historica/
-
-REFS:
-
-https://www.youtube.com/watch?v=IAGVdxrAOxI
+## ![H](https://cdn-icons-png.flaticon.com/24/3786/3786109.png) Instalação e Execução
