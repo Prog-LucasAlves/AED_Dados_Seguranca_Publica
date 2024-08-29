@@ -33,7 +33,7 @@ O objetivo desse projeto é **analisar** os dados de segurança pública do esta
 - Pandas: Manipulação e análise de dados.
 - Streamlit: Framework desenvolvido em Python que torna possível a visualização de dados para uma simples análise exploratória de um dataset.
 
-> [!IMPORTANTE]
+> [!IMPORTANT]
 > Render: Plataforma para realizar o Deploy(Dashboard).[Link](https://render.com/).
 
 ## ![G](https://cdn-icons-png.flaticon.com/24/1991/1991103.png) Dashboard
