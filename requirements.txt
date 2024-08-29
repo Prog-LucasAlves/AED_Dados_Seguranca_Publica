@@ -1,3 +1,4 @@
 streamlit==1.26.0
 duckdb==1.0.0
 folium==0.17.0
+streamlit-folium==0.22.0
