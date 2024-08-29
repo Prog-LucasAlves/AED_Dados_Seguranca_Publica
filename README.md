@@ -1,4 +1,4 @@
-# Análise de dados da Segurança Pública do Estado do Rio de Janeiro
+# <p style="font-family: times, serif; font-size:11pt; font-style:italic"> Análise de dados da Segurança Pública do Estado do Rio de Janeiro </p>
 
 ## ![A](https://cdn-icons-png.flaticon.com/24/1085/1085456.png) ISP (Instituto de Segurança Pública)
 
@@ -8,9 +8,9 @@
 
 - Dados extraidos nesse *[link](https://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv)*
 
-- Dados já baixados estão na pasta(.parquet) *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_data/GOLDEN)*
+- Dados já baixados estão nesta pasta(.parquet) *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/raw_data/GOLDEN)*
 
-- Dicionário dos dados estão na pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_data)*
+- Dicionário dos dados estão nesta pasta *[data](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/tree/main/data/dict_data)*
 
 ## ![C](https://cdn-icons-png.flaticon.com/24/1534/1534999.png) Objetivo
 
