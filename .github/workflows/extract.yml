@@ -2,7 +2,7 @@ name: GitHub Actions Extract
 
 on:
     schedule:
-        - cron: '* * * * *'
+        - cron: '*/60 * * * *'
 
 jobs:
     build:
