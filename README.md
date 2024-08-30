@@ -33,11 +33,20 @@ O objetivo desse projeto é **analisar** os dados de segurança pública do esta
 - Pandas: Manipulação e análise de dados.
 - Streamlit: Framework desenvolvido em Python que torna possível a visualização de dados para uma simples análise exploratória de um dataset.
 
-> [!IMPORTANT]
-> Render: Plataforma para realizar o Deploy(Dashboard).[Link](https://render.com/).
+> [!NOTE]
+> Render: Plataforma para realizar o Deploy(Dashboard). [Link](https://render.com/).
 
 ## ![G](https://cdn-icons-png.flaticon.com/24/1991/1991103.png) Dashboard
 
 - [link](https://aed-dados-seguranca-publica.onrender.com)
 
 ## ![H](https://cdn-icons-png.flaticon.com/24/3786/3786109.png) Instalação e Execução
+
+1. Criando o diretório para o projeto.
+
+```bash
+mkdir AED_Dados_Seguranca_Publica_RJ
+cd AED_Dados_Seguranca_Publica_RJ
+```
+
+[![GitHub Actions Extract](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/actions/workflows/extract.yml/badge.svg?branch=main)](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/actions/workflows/extract.yml)
