@@ -32,7 +32,7 @@ def transformardados():
     dados.loc[dados["mes"] == 12, "mes_nome"] = "Dezembro"
 
     # Carregando os dados com os nomes e coordenadas dos municípios brasileiros
-    name_coordinates = pd.read_csv("../../data/map/name_coordinates.csv", sep=";")
+    name_coordinates = pd.read_csv("data/map/name_coordinates.csv", sep=";")
 
     # Concatenando os dados das coordenadas
     dados = dados.merge(name_coordinates, how="left")
