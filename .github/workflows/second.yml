@@ -1,12 +1,13 @@
 name:
-    Extract Cron Job
+    Transformation Cron Job
 
     # Controls when the workflow will run
 on:
-    # Triggers the workflow every 5 minutes
-    schedule:
-      - cron: "0 5 * * *"
-    workflow_dispatch:
+    workflow_run:
+      workflows: ["Extract Cron Job"]
+      branches: [main]
+      types:
+        - completed
 
 jobs:
 
@@ -33,9 +34,9 @@ jobs:
 
         - name: Execução script python
           run: |
-            python SRC/extract/extract_and_save_data.py
+            python SRC/transformation/transformation.py
 
         - name: Realiza commit and push
           uses: stefanzweifel/git-auto-commit-action@v5
           with:
-            commit_message: "up SILVER_data.parquet"
+            commit_message: "up GOLDEN_data.parquet"
