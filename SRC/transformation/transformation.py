@@ -4,7 +4,7 @@ import pandas as pd
 
 def carregardados():
     # Local onde estão os dados
-    path = "../../data/raw_data/SILVER/"
+    path = "data/raw_data/SILVER/"
 
     # Lendo os dados salvos
     dados = pd.read_parquet(f"{path}SILVER_data.parquet")
@@ -38,7 +38,7 @@ def transformardados():
     dados = dados.merge(name_coordinates, how="left")
 
     # Local onde serão salvos os dados transformados(GOLDEN)
-    path = "../../data/raw_data/GOLDEN/"
+    path = "data/raw_data/GOLDEN/"
 
     # Salvando os dados transformados
     dados.to_parquet(f"{path}GOLDEN_data.parquet", index=False)
