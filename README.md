@@ -14,7 +14,7 @@ O objetivo desse projeto é **analisar** os dados de segurança pública do esta
    * (Gráfico de barras com o total de ocorrências por mês).
    * (Mapa de calor com o total de ocorrências por município)
 2. Filtro das ocorrências registradas por **município** | Barra lateral.
-3. Filtro das ocorrências registradas por **região**.
+3. Filtro das ocorrências registradas por **região** | Barra lateral.
 
 ![D](https://github.com/Prog-LucasAlves/AED_Dados_Seguranca_Publica/blob/main/image/Preview.png)
 
