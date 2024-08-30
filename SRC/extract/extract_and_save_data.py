@@ -4,10 +4,10 @@ import pandas as pd
 
 def extractandload():
     """
-    Função para extrair e salvar os dados
+    Função para extrair e salvar os dados.
     """
     # Local aonde será salvo os dados coletados
-    path = "../../data/raw_data/SILVER/"
+    path = "data/raw_data/SILVER/"
     # URL dos dados que serão coletados
     csv = "http://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv"
     # Lendo os dados e salvando em um arquivo parquet
