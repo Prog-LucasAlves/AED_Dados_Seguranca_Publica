@@ -32,7 +32,7 @@ jobs:
         - name: Instalação das dependências
           run: |
             python -m pip install --upgrade pip
-            pip install pandas
+            pip install pandas pyarrow fastparquet
 
         - name: Execução script python
           run: |
