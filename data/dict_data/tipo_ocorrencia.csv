@@ -1,2 +1,7 @@
 tipo_ocorrencia;descricao
 hom_doloso;Homicídio doloso
+lesao_corp_morte;Lesão corporal seguida de morte
+latrocinio;Latrocínio (roubo seguido de morte)
+cvli;Crimes Violentos Letais Intencionais*
+hom_por_interv_policial;Morte por intervenção de agente do Estado
+letalidade_violenta;Letalidade violenta*
