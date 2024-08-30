@@ -30,13 +30,13 @@ path_descricoes = "./data/dict_data/tipo_ocorrencia.csv"
 
 # Título do dashboard
 title = """
-<p style="color:Black; font-size: 40px; font-weight: bolder;"
+<p style="color:Black; font-size: 30px; font-weight: bolder;"
 > Dashboard dos Dados da Segurança Pública do Estado do RJ </p>
 """
 st.markdown(title, unsafe_allow_html=True)
 
 # Colunas do dashboard
-col1, col2, col3 = st.columns((1, 1, 1))
+col1, col2 = st.columns((1, 2))
 
 with col1:
     # Carregando as datas(ano)
@@ -48,23 +48,24 @@ with col1:
     ano = st.selectbox("Selecione o Ano", ano_df)
 
 with col2:
-    # Carregando o arquivo das descrições das variáveis
+    # Carregando as descrições das ocorrências
     titulo_df = duckdb.query(
         f"""SELECT descricao
-        FROM '{path_descricoes}'"""
+        FROM '{path_descricoes}'
+        ORDER BY descricao"""
     ).to_df()
     titulo = st.selectbox("Titulo", titulo_df)
 
-with col3:
-    # Criando informação com o total de ocorrencias(Geral)
-    titulo_ocorrencia = duckdb.query(
-        f"""SELECT tipo_ocorrencia
-        FROM '{path_descricoes}'
-        WHERE descricao = '{titulo}'"""
-    ).to_df()
-    titulo_ocorrencia = titulo_ocorrencia.iloc[0, 0]
 
-# Criando informação com o total de ocorrencias por município no mapa
+# Criando informação com o total de ocorrências(Geral)
+titulo_ocorrencia = duckdb.query(
+    f"""SELECT tipo_ocorrencia
+    FROM '{path_descricoes}'
+    WHERE descricao = '{titulo}'"""
+).to_df()
+titulo_ocorrencia = titulo_ocorrencia.iloc[0, 0]
+
+# Criando informação com o total de ocorrências por município no mapa
 total_titulo_map = duckdb.query(
     f"""SELECT ano, fmun, fmun_cod, SUM({titulo_ocorrencia})
     FROM '{path_parquet}'
@@ -77,35 +78,146 @@ total_titulo_map.columns = ["Ano", "Município", "Município_cod", "Total"]
 total_titulo_map["Município_cod"] = total_titulo_map["Município_cod"].astype(str)
 total_titulo_map_index = total_titulo_map.set_index("Município_cod")["Total"]
 
+with col1:
+    # Grafico de barras | Total de ocorrências por Mês
+    total_mes = duckdb.query(
+        f"""SELECT mes AS Mês, SUM({titulo_ocorrencia}) AS Total
+        FROM '{path_parquet}'
+        WHERE ano = '{ano}'
+        GROUP BY mes
+        """
+    ).to_df()
 
-# Criando Mapa
-path_mapa = "./data/map/geojs-33-mun.json"
+    st.bar_chart(
+        total_mes,
+        x="Mês",
+        y="Total",
+        color="#3CB371",
+        horizontal=True,
+        width=1,
+        height=380,
+        use_container_width=True,
+    )
 
-colormap = linear.YlGn_09.scale(
-    total_titulo_map["Total"].min(), total_titulo_map["Total"].max()
+with col2:
+    # Criando Mapa
+    path_mapa = "./data/map/geojs-33-mun.json"
+
+    colormap = linear.YlGn_09.scale(
+        total_titulo_map["Total"].min(), total_titulo_map["Total"].max()
+    )
+
+    color_dict = {
+        key: colormap(total_titulo_map_index[key])
+        for key in total_titulo_map_index.keys()
+    }
+
+    m = folium.Map(location=([-22.42, -42.48]), zoom_start=7)
+
+    folium.GeoJson(
+        path_mapa,
+        name="geojson",
+        zoom_on_click=True,
+        style_function=lambda feature: {
+            "fillColor": color_dict[feature["id"]],
+            "color": "black",
+            "weight": 0.3,
+            "fillOpacity": 0.5,
+        },
+    ).add_to(m)
+
+    colormap.caption = ""
+    colormap.add_to(m)
+
+    st_folium(m, height=350, width=570)
+
+    folium.LayerControl().add_to(m)
+
+st.markdown("---")
+
+# Observação
+with st.expander("**Observação:**", expanded=True):
+    if titulo == "Crimes Violentos Letais Intencionais*":
+        CVLI = """
+<p style="color:Black; font-size: 15px; font-weight: bolder;"
+> *Crimes Violentos Letais Intencionais: Homicídio doloso + Lesão corporal seguida de morte + Latrocínio. </p>
+"""
+        st.markdown(CVLI, unsafe_allow_html=True)
+
+    elif titulo == "Letalidade violenta*":
+        LV = """
+<p style="color:Black; font-size: 15px; font-weight: bolder;"
+> *Letalidade violenta: Homicídio doloso + Lesão corporal seguida de morte + Latrocínio + Morte por intervenção de agente do Estado. </p>
+"""
+        st.markdown(LV, unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ########## Barra Lateral ###########
+st.sidebar.title("Filtros")
+st.sidebar.subheader(f"{ano} | {titulo}")
+
+# Barra Lateral | Total de Ocorrências
+total_ocorrencias = total_titulo_map["Total"].sum()
+total_ocorrencias = int(total_ocorrencias)
+st.sidebar.text(f"Total de Ocorrências: {total_ocorrencias:.0f}")
+
+st.sidebar.markdown("---")
+
+# Barra Lateral | Municípios
+municipios_df = duckdb.query(
+    f"""SELECT DISTINCT fmun
+    FROM '{path_parquet}'
+    ORDER BY fmun"""
+).to_df()
+
+municipio = st.sidebar.selectbox("Município:", municipios_df)
+
+# Barra Lateral | Municípios | Total de Ocorrências
+total_municipio_df = duckdb.query(
+    f"""SELECT SUM({titulo_ocorrencia})
+    FROM '{path_parquet}'
+    WHERE fmun = '{municipio}'
+    AND ano = '{ano}'
+    """
+).to_df()
+
+total_municipio = st.sidebar.text(
+    f"Total de Ocorrências: {total_municipio_df.iloc[0, 0]:.0f}"
 )
 
-color_dict = {
-    key: colormap(total_titulo_map_index[key]) for key in total_titulo_map_index.keys()
-}
+represent_municipio = total_municipio_df.iloc[0, 0] / total_ocorrencias
 
-m = folium.Map(location=([-22.42, -42.48]), zoom_start=7)
+represent_municipio_select = st.sidebar.text(
+    f"Representatividade: {represent_municipio:.2%}"
+)
 
-folium.GeoJson(
-    path_mapa,
-    name="geojson",
-    zoom_on_click=True,
-    style_function=lambda feature: {
-        "fillColor": color_dict[feature["id"]],
-        "color": "black",
-        "weight": 0.3,
-        "fillOpacity": 0.5,
-    },
-).add_to(m)
+st.sidebar.markdown("---")
 
-colormap.caption = ""
-colormap.add_to(m)
+# Barra Lateral | Região
+regiao_df = duckdb.query(
+    f"""SELECT DISTINCT regiao
+    FROM '{path_parquet}'
+    ORDER BY regiao
+    """
+).to_df()
 
-st_folium(m, height=350, width=790)
+regiao = st.sidebar.selectbox("Região:", regiao_df)
 
-folium.LayerControl().add_to(m)
+# Barra Lateral | Região | Total de Ocorrências
+total_regiao_df = duckdb.query(
+    f"""SELECT SUM({titulo_ocorrencia})
+    FROM '{path_parquet}'
+    WHERE regiao = '{regiao}'
+    AND ano = '{ano}'
+    """
+).to_df()
+
+total_regiao = st.sidebar.text(
+    f"Total de Ocorrências: {total_regiao_df.iloc[0, 0]:.0f}"
+)
+
+represent_regiao = total_regiao_df.iloc[0, 0] / total_ocorrencias
+
+represent_regiao_select = st.sidebar.text(f"Representatividade: {represent_regiao:.2%}")
+# ########## Barra Lateral ###########
