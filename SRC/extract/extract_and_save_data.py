@@ -8,11 +8,13 @@ def extractandload():
     """
     # Local aonde será salvo os dados coletados
     path = "data/raw_data/SILVER/"
+    path1 = "./data/"
     # URL dos dados que serão coletados
     csv = "http://www.ispdados.rj.gov.br/Arquivos/BaseMunicipioMensal.csv"
     # Lendo os dados e salvando em um arquivo parquet
     rawDados = pd.read_csv(csv, encoding="ISO-8859-1", engine="python", sep=";")
     rawDados.to_parquet(f"{path}SILVER_data.parquet", index=False)
+    rawDados.to_parquet(f"{path1}SILVER_data.parquet", index=False)
 
 
 if __name__ == "__main__":
