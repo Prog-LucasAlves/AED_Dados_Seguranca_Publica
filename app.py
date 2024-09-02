@@ -93,11 +93,10 @@ with col1:
         x="Mês",
         y="Total",
         color="#3CB371",
-        # horizontal=True,
         horizontal=True,
-        width=1,
-        height=380,
-        use_container_width=True,
+        # width=1,
+        # height=380,
+        # use_container_width=True,
     )
 
 with col2:
