@@ -94,9 +94,9 @@ with col1:
         y="Total",
         color="#3CB371",
         horizontal=True,
-        # width=1,
-        # height=380,
-        # use_container_width=True,
+        width=1,
+        height=380,
+        use_container_width=True,
     )
 
 with col2:
