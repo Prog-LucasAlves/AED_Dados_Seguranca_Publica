@@ -89,7 +89,7 @@ with col1:
     ).to_df()
 
     st.bar_chart(
-        total_mes,
+        data=total_mes,
         x="Mês",
         y="Total",
         color="#3CB371",
