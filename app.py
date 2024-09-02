@@ -133,6 +133,31 @@ with col2:
 
     folium.LayerControl().add_to(m)
 
+# Metricas
+
+col1, col2, col3 = st.columns(3)
+
+total_ocorrencias_2024 = duckdb.query(
+    f"""SELECT SUM({titulo_ocorrencia}) AS Total
+    FROM '{path_parquet}'
+    WHERE ano = '2024'
+    """
+).to_df()
+
+metricas_2024 = total_ocorrencias_2024["Total"].sum()
+metricas_2024 = int(metricas_2024)
+M1 = (metricas_2024 / total_titulo_map["Total"].sum()) - 1
+col1.metric(
+    label="Total de Ocorrências em 2024:",
+    value=f"{metricas_2024:.0f}",
+    delta=f"{M1:.2%}",
+)
+
+col2.metric(
+    label=f"Total de Ocorrências em {ano}:",
+    value=f"{total_titulo_map['Total'].sum():.0f}",
+)
+
 st.markdown("---")
 
 # Observação
@@ -160,7 +185,6 @@ st.sidebar.subheader(f"{ano} | {titulo}")
 # Barra Lateral | Total de Ocorrências
 total_ocorrencias = total_titulo_map["Total"].sum()
 total_ocorrencias = int(total_ocorrencias)
-st.sidebar.text(f"Total de Ocorrências: {total_ocorrencias:.0f}")
 
 st.sidebar.markdown("---")
 
