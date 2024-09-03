@@ -5,7 +5,7 @@ name:
 on:
     # Triggers the workflow every 5 minutes
     schedule:
-      - cron: "0 5 * * *"
+      - cron: "0 15 20 * *"
     workflow_dispatch:
 
 jobs:
