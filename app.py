@@ -1,3 +1,7 @@
+"""
+Dashboard Dados Segurança Pública do RJ
+"""
+
 # Bibliotecas utilizadas
 import folium.map
 import streamlit as st
@@ -7,89 +11,111 @@ import folium
 from streamlit_folium import st_folium
 from branca.colormap import linear
 
-# Configurações da página
-img = Image.open("./image/4744315.png")
-
-st.set_page_config(
-    page_title="Em Construção",
-    page_icon=img,
-    layout="wide",
-    initial_sidebar_state="expanded",
-    menu_items={
-        "Get Help": "https://www.extremelycoolapp.com/help",
-        "Report a bug": "https://www.extremelycoolapp.com/bug",
-        "About": "# This is a header. This is an *extremely* cool app!",
-    },
-)
-
+# Diretório dos Dados
 # Caminho do arquivo parquet com os dados
-path_parquet = "./data/raw_data/GOLDEN/GOLDEN_data.parquet"
+PATH_PARQUET = "./data/raw_data/GOLDEN/GOLDEN_data.parquet"
 
 # Caminho do arquivo com as descrições das variáveis
-path_descricoes = "./data/dict_data/tipo_ocorrencia.csv"
+PATH_DESCRIPTIONS = "./data/dict_data/tipo_ocorrencia.csv"
 
-# Título do dashboard
-title = """
+# Caminho do arquivo com o mapa do RJ
+PATH_MAPA = "./data/map/geojs-33-mun.json"
+
+
+def PypiConfigPage():
+    """
+    Função para configurar a página.
+    """
+    img = Image.open("./image/4744315.png")
+
+    st.set_page_config(
+        page_title="Em Construção",
+        page_icon=img,
+        layout="wide",
+        initial_sidebar_state="expanded",
+        menu_items={
+            "Get Help": "https://www.extremelycoolapp.com/help",
+            "Report a bug": "https://www.extremelycoolapp.com/bug",
+            "About": "# This is a header. This is an *extremely* cool app!",
+        },
+    )
+
+
+def PypiTitle():
+    """
+    Função para exibir o título do dashboard.
+    """
+    TITLE = """
 <p style="color:Black; font-size: 30px; font-weight: bolder;"
 > Dashboard dos Dados da Segurança Pública do Estado do RJ </p>
 """
-st.markdown(title, unsafe_allow_html=True)
+    st.markdown(TITLE, unsafe_allow_html=True)
 
-# Colunas do dashboard
-col1, col2 = st.columns((1, 2))
 
-with col1:
-    # Carregando as datas(ano)
-    ano_df = duckdb.query(
+def PypiInfoDash():
+    """
+    Função para criar os selectbox de data(Ano) | Ocorrência.
+    """
+    # Colunas do Selectbox
+    col1, col2 = st.columns((1, 2))
+
+    # Selectbox Ano
+    ANODF = duckdb.query(
         f"""SELECT DISTINCT ano
-        FROM '{path_parquet}'
+        FROM '{PATH_PARQUET}'
         ORDER BY ano"""
     ).to_df()
-    ano = st.selectbox("Selecione o Ano", ano_df)
+    ANO = col1.selectbox("Selecione o Ano:", ANODF)
 
-with col2:
-    # Carregando as descrições das ocorrências
-    titulo_df = duckdb.query(
+    # Selectbox Título Ocorrência
+    TITULODF = duckdb.query(
         f"""SELECT descricao
-        FROM '{path_descricoes}'
+        FROM '{PATH_DESCRIPTIONS}'
         ORDER BY descricao"""
     ).to_df()
-    titulo = st.selectbox("Titulo", titulo_df)
+    TITULO = col2.selectbox("Título da Ocorrência:", TITULODF)
+
+    # Título das ocorrências
+    TITULOOCORRENCIADF = duckdb.query(
+        f"""SELECT tipo_ocorrencia
+        FROM '{PATH_DESCRIPTIONS}'
+        WHERE descricao = '{TITULO}'"""
+    ).to_df()
+    TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
+
+    # Observação sobre o título da ocorrência
+    if TITULO == "Crimes Violentos Letais Intencionais*":
+        CVLI = """
+<p style="color:DimGrey; font-size: 14px; font-weight: bolder;"
+> *Crimes Violentos Letais Intencionais: Homicídio doloso + Lesão corporal seguida de morte + Latrocínio. </p>
+"""
+        st.markdown(CVLI, unsafe_allow_html=True)
+
+    return ANO, TITULO, TITULOOCORRENCIA
 
 
-# Criando informação com o total de ocorrências(Geral)
-titulo_ocorrencia = duckdb.query(
-    f"""SELECT tipo_ocorrencia
-    FROM '{path_descricoes}'
-    WHERE descricao = '{titulo}'"""
-).to_df()
-titulo_ocorrencia = titulo_ocorrencia.iloc[0, 0]
-
-# Criando informação com o total de ocorrências por município no mapa
-total_titulo_map = duckdb.query(
-    f"""SELECT ano, fmun, fmun_cod, SUM({titulo_ocorrencia})
-    FROM '{path_parquet}'
-    WHERE ano = '{ano}'
-    GROUP BY ano, fmun, fmun_cod
+def Pypigraphic(ano, tituloocorrencia):
     """
-).to_df()
+    Função para criar os gráficos(Barras | Mapa).
+    """
 
-total_titulo_map.columns = ["Ano", "Município", "Município_cod", "Total"]
-total_titulo_map["Município_cod"] = total_titulo_map["Município_cod"].astype(str)
-total_titulo_map_index = total_titulo_map.set_index("Município_cod")["Total"]
+    ANO = ano
+    TITULOOCORRENCIA = tituloocorrencia
 
-with col1:
-    # Grafico de barras | Total de ocorrências por Mês
-    total_mes = duckdb.query(
-        f"""SELECT mes AS Mês, SUM({titulo_ocorrencia}) AS Total
-        FROM '{path_parquet}'
-        WHERE ano = '{ano}'
+    # Colunas dos graficos
+    col3, col4 = st.columns((1, 2))
+
+    # Grafico de barras | Total de ocorrências por mês
+    TOTALMESDF = duckdb.query(
+        f"""SELECT mes AS Mês, SUM({TITULOOCORRENCIA}) AS Total
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '{ANO}'
         GROUP BY mes
-        """
+        ORDER BY mes"""
     ).to_df()
 
-    st.bar_chart(
-        data=total_mes,
+    col3.bar_chart(
+        data=TOTALMESDF,
         x="Mês",
         y="Total",
         color="#3CB371",
@@ -99,149 +125,80 @@ with col1:
         use_container_width=True,
     )
 
-with col2:
     # Criando Mapa
-    path_mapa = "./data/map/geojs-33-mun.json"
 
-    colormap = linear.YlGn_09.scale(
-        total_titulo_map["Total"].min(), total_titulo_map["Total"].max()
-    )
+    # Criando informação com o total de ocorrências por município.
+    TOTALMUNICIPIODF = duckdb.query(
+        f"""SELECT ano, fmun, fmun_cod, SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '{ANO}'
+        GROUP BY ano, fmun, fmun_cod
+        """
+    ).to_df()
 
-    color_dict = {
-        key: colormap(total_titulo_map_index[key])
-        for key in total_titulo_map_index.keys()
-    }
+    TOTALMUNICIPIODF.columns = ["Ano", "Município", "Município_cod", "Total"]
+    TOTALMUNICIPIODF["Município_cod"] = TOTALMUNICIPIODF["Município_cod"].astype(str)
+    TOTALTITULODFINDEX = TOTALMUNICIPIODF.set_index("Município_cod")["Total"]
 
-    m = folium.Map(location=([-22.42, -42.48]), zoom_start=7)
+    with col4:
+        colormap = linear.YlGn_09.scale(
+            TOTALMUNICIPIODF["Total"].min(), TOTALMUNICIPIODF["Total"].max()
+        )
 
-    folium.GeoJson(
-        path_mapa,
-        name="geojson",
-        zoom_on_click=True,
-        style_function=lambda feature: {
-            "fillColor": color_dict[feature["id"]],
-            "color": "black",
-            "weight": 0.3,
-            "fillOpacity": 0.5,
-        },
-    ).add_to(m)
+        color_dict = {
+            key: colormap(TOTALTITULODFINDEX[key]) for key in TOTALTITULODFINDEX.keys()
+        }
 
-    colormap.caption = ""
-    colormap.add_to(m)
+        M = folium.Map(location=([-22.10, -42.48]), zoom_start=7)
 
-    st_folium(m, height=350, width=570)
+        folium.GeoJson(
+            PATH_MAPA,
+            name="geojson",
+            zoom_on_click=True,
+            style_function=lambda feature: {
+                "fillColor": color_dict[feature["id"]],
+                "color": "black",
+                "weight": 0.3,
+                "fillOpacity": 0.5,
+            },
+        ).add_to(M)
 
-    folium.LayerControl().add_to(m)
+        colormap.caption = ""
+        colormap.add_to(M)
 
-# Metricas
+        st_folium(M, height=350, width=570)
 
-col1, col2, col3 = st.columns(3)
+        folium.LayerControl().add_to(M)
 
-total_ocorrencias_2024 = duckdb.query(
-    f"""SELECT SUM({titulo_ocorrencia}) AS Total
-    FROM '{path_parquet}'
-    WHERE ano = '2024'
+
+def PypiSidebar(ano, titulo):
     """
-).to_df()
-
-metricas_2024 = total_ocorrencias_2024["Total"].sum()
-metricas_2024 = int(metricas_2024)
-M1 = (metricas_2024 / total_titulo_map["Total"].sum()) - 1
-col1.metric(
-    label="Total de Ocorrências em 2024:",
-    value=f"{metricas_2024:.0f}",
-    delta=f"{M1:.2%}",
-)
-
-col2.metric(
-    label=f"Total de Ocorrências em {ano}:",
-    value=f"{total_titulo_map['Total'].sum():.0f}",
-)
-
-st.markdown("---")
-
-# Observação
-with st.expander("**Observação:**", expanded=True):
-    if titulo == "Crimes Violentos Letais Intencionais*":
-        CVLI = """
-<p style="color:Black; font-size: 15px; font-weight: bolder;"
-> *Crimes Violentos Letais Intencionais: Homicídio doloso + Lesão corporal seguida de morte + Latrocínio. </p>
-"""
-        st.markdown(CVLI, unsafe_allow_html=True)
-
-    elif titulo == "Letalidade violenta*":
-        LV = """
-<p style="color:Black; font-size: 15px; font-weight: bolder;"
-> *Letalidade violenta: Homicídio doloso + Lesão corporal seguida de morte + Latrocínio + Morte por intervenção de agente do Estado. </p>
-"""
-        st.markdown(LV, unsafe_allow_html=True)
-
-st.markdown("---")
-
-# ########## Barra Lateral ###########
-st.sidebar.title("Filtros")
-st.sidebar.subheader(f"{ano} | {titulo}")
-
-# Barra Lateral | Total de Ocorrências
-total_ocorrencias = total_titulo_map["Total"].sum()
-total_ocorrencias = int(total_ocorrencias)
-
-st.sidebar.markdown("---")
-
-# Barra Lateral | Municípios
-municipios_df = duckdb.query(
-    f"""SELECT DISTINCT fmun
-    FROM '{path_parquet}'
-    ORDER BY fmun"""
-).to_df()
-
-municipio = st.sidebar.selectbox("Município:", municipios_df)
-
-# Barra Lateral | Municípios | Total de Ocorrências
-total_municipio_df = duckdb.query(
-    f"""SELECT SUM({titulo_ocorrencia})
-    FROM '{path_parquet}'
-    WHERE fmun = '{municipio}'
-    AND ano = '{ano}'
+    Função para criar a barra lateral do dashboard.
     """
-).to_df()
 
-total_municipio = st.sidebar.text(
-    f"Total de Ocorrências: {total_municipio_df.iloc[0, 0]:.0f}"
-)
+    ANO = ano
+    TITULO = titulo
 
-represent_municipio = total_municipio_df.iloc[0, 0] / total_ocorrencias
+    st.sidebar.title("Filtros")
+    st.sidebar.subheader(f"{ANO} | {TITULO}")
 
-represent_municipio_select = st.sidebar.text(
-    f"Representatividade: {represent_municipio:.2%}"
-)
+    st.sidebar.markdown("---")
 
-st.sidebar.markdown("---")
+    # Barra Lateral | Municípios
+    MUNICIPIOSDF = duckdb.query(
+        f"""SELECT DISTINCT fmun
+        FROM '{PATH_PARQUET}'
+        ORDER BY fmun"""
+    ).to_df()
 
-# Barra Lateral | Região
-regiao_df = duckdb.query(
-    f"""SELECT DISTINCT regiao
-    FROM '{path_parquet}'
-    ORDER BY regiao
-    """
-).to_df()
+    MUNICIPIO = st.sidebar.selectbox("Município:", MUNICIPIOSDF)
 
-regiao = st.sidebar.selectbox("Região:", regiao_df)
+    return MUNICIPIO
 
-# Barra Lateral | Região | Total de Ocorrências
-total_regiao_df = duckdb.query(
-    f"""SELECT SUM({titulo_ocorrencia})
-    FROM '{path_parquet}'
-    WHERE regiao = '{regiao}'
-    AND ano = '{ano}'
-    """
-).to_df()
 
-total_regiao = st.sidebar.text(
-    f"Total de Ocorrências: {total_regiao_df.iloc[0, 0]:.0f}"
-)
-
-represent_regiao = total_regiao_df.iloc[0, 0] / total_ocorrencias
-
-represent_regiao_select = st.sidebar.text(f"Representatividade: {represent_regiao:.2%}")
-# ########## Barra Lateral ###########
+if __name__ == "__main__":
+    PypiConfigPage()
+    PypiTitle()
+    resultano, resulttitulo, resultocorrencia = PypiInfoDash()
+    Pypigraphic(resultano, resultocorrencia)
+    PypiSidebar(resultano, resulttitulo)
