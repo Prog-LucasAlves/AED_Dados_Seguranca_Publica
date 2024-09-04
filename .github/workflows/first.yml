@@ -17,12 +17,12 @@ jobs:
       steps:
 
         - name: Check conteudo do repositorio
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
           with:
             fetch-depth: 0
 
         - name: Instala python 3.11.5
-          uses: actions/setup-python@v4
+          uses: actions/setup-python@v5
           with:
             python-version: '3.11.5'
 
