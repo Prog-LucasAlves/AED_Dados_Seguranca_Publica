@@ -5,3 +5,10 @@ latrocinio;Latrocínio (roubo seguido de morte)
 cvli;Crimes Violentos Letais Intencionais*
 hom_por_interv_policial;Morte por intervenção de agente do Estado
 letalidade_violenta;Letalidade violenta*
+tentat_hom;Tentativa de homicídio
+lesao_corp_dolosa;Lesão corporal dolosa
+estupro;Estupro
+hom_culposo;Homicídio culposo (trânsito)*
+lesao_corp_culposa;Lesão corporal culposa (trânsito)
+roubo_transeunte;Roubo a transeunte
+roubo_celular;Roubo de telefone celular
