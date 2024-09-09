@@ -1,7 +1,7 @@
 # Bibliotecas utilizadas
 import pandas as pd
 
-# Criando dicionário com a colunas
+# # Dicionário que mapeia códigos de crimes para suas descrições completas em português
 tipo_ocorrencia = {
     "hom_doloso": "Homicídio doloso",
     "lesao_corp_morte": "Lesão corporal seguida de morte",
