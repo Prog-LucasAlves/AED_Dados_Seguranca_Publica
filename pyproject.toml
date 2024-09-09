@@ -15,6 +15,7 @@ streamlit = "^1.37.1"
 duckdb = "^1.0.0"
 folium = "^0.17.0"
 streamlit-folium = "^0.22.0"
+streamlit-extras = "^0.4.7"
 
 
 [tool.poetry.group.dev.dependencies]
