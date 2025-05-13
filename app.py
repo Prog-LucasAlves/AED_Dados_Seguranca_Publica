@@ -306,7 +306,7 @@ def PypiMetrics(tituloocorrencia):
 """
     st.markdown(T, unsafe_allow_html=True)
 
-    col1, col2, col3, col4 = st.columns((1, 1, 1, 1))
+    col1, col2, col3, col4, col5 = st.columns((1, 1, 1, 1, 1))
 
     TOTALOC2020 = duckdb.query(
         f"""SELECT SUM({TITULOOCORRENCIA})
@@ -324,7 +324,7 @@ def PypiMetrics(tituloocorrencia):
 
     DIFFOC2021 = (TOTALOC2020 / TOTALOC2021) - 1
 
-    col4.metric(
+    col5.metric(
         label="⌛Total de Ocorrências em 2021:",
         value=f"{TOTALOC2021.iloc[0, 0]:.0f}",
         delta=f"{DIFFOC2021.iloc[0, 0]:.2%}",
@@ -339,7 +339,7 @@ def PypiMetrics(tituloocorrencia):
 
     DIFFOC2122 = (TOTALOC2022 / TOTALOC2021) - 1
 
-    col3.metric(
+    col4.metric(
         label="⌛Total de Ocorrências em 2022:",
         value=f"{TOTALOC2022.iloc[0, 0]:.0f}",
         delta=f"{DIFFOC2122.iloc[0, 0]:.2%}",
@@ -354,7 +354,7 @@ def PypiMetrics(tituloocorrencia):
 
     DIFFOC2322 = (TOTALOC2023 / TOTALOC2022) - 1
 
-    col2.metric(
+    col3.metric(
         label="⌛Total de Ocorrências em 2023:",
         value=f"{TOTALOC2023.iloc[0, 0]:.0f}",
         delta=f"{DIFFOC2322.iloc[0, 0]:.2%}",
@@ -369,10 +369,25 @@ def PypiMetrics(tituloocorrencia):
 
     DIFFOC2423 = (TOTALOC2024 / TOTALOC2023) - 1
 
-    col1.metric(
+    col2.metric(
         label="⌛Total de Ocorrências em 2024:",
         value=f"{TOTALOC2024.iloc[0, 0]:.0f}",
         delta=f"{DIFFOC2423.iloc[0, 0]:.2%}",
+    )
+
+    TOATALOC2025 = duckdb.query(
+        f"""SELECT SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2025'
+        """
+    ).to_df()
+
+    DIFFOC2524 = (TOATALOC2025 / TOTALOC2024) - 1
+
+    col1.metric(
+        label="⌛Total de Ocorrências em 2025:",
+        value=f"{TOATALOC2025.iloc[0, 0]:.0f}",
+        delta=f"{DIFFOC2524.iloc[0, 0]:.2%}",
     )
 
     st.markdown("---")
