@@ -79,20 +79,12 @@ def PypiAttData():
     return DATAATTMES
 
 
-def PypiInfoDash():
+def PypiInfoGeral():
     """
     Função para criar os selectbox de data(Ano) | Ocorrência.
     """
     # Colunas do Selectbox
-    col1, col2 = st.columns((1, 2))
-
-    # Selectbox Ano
-    ANODF = duckdb.query(
-        f"""SELECT DISTINCT ano
-        FROM '{PATH_PARQUET}'
-        ORDER BY ano"""
-    ).to_df()
-    ANO = col1.selectbox("📆​Selecione o Ano:", ANODF)
+    col1 = st.columns((1))
 
     # Selectbox Título Ocorrência
     TITULODF = duckdb.query(
@@ -100,7 +92,7 @@ def PypiInfoDash():
         FROM '{PATH_DESCRIPTIONS}'
         ORDER BY descricao"""
     ).to_df()
-    TITULO = col2.selectbox("​📝​Título da Ocorrência:", TITULODF)
+    TITULO = col1.selectbox("​📝​Título da Ocorrência:", TITULODF)
 
     # Título das ocorrências
     TITULOOCORRENCIADF = duckdb.query(
@@ -132,15 +124,14 @@ def PypiInfoDash():
 """
         st.markdown(LV, unsafe_allow_html=True)
 
-    return ANO, TITULO, TITULOOCORRENCIA
+    return TITULO, TITULOOCORRENCIA
 
 
-def Pypigraphic(ano, tituloocorrencia):
+def PypigraphicGeral(tituloocorrencia):
     """
     Função para criar os gráficos(Barras | Mapa).
     """
 
-    ANO = ano
     TITULOOCORRENCIA = tituloocorrencia
 
     # Colunas dos graficos
@@ -148,16 +139,15 @@ def Pypigraphic(ano, tituloocorrencia):
 
     # Grafico de barras | Total de ocorrências por mês
     TOTALMESDF = duckdb.query(
-        f"""SELECT mes AS Mês, SUM({TITULOOCORRENCIA}) AS Total
+        f"""SELECT ano AS Ano, SUM({TITULOOCORRENCIA}) AS Total
         FROM '{PATH_PARQUET}'
-        WHERE ano = '{ANO}'
-        GROUP BY mes
-        ORDER BY mes"""
+        GROUP BY ano
+        ORDER BY ano"""
     ).to_df()
 
     col3.bar_chart(
         data=TOTALMESDF,
-        x="Mês",
+        x="Ano",
         y="Total",
         color="#3CB371",
         horizontal=True,
@@ -174,7 +164,6 @@ def Pypigraphic(ano, tituloocorrencia):
     TOTALGERALDF = duckdb.query(
         f"""SELECT ano, fmun, fmun_cod, SUM({TITULOOCORRENCIA})
         FROM '{PATH_PARQUET}'
-        WHERE ano = '{ANO}'
         GROUP BY ano, fmun, fmun_cod
         """
     ).to_df()
@@ -352,16 +341,16 @@ def main():
     aba1, aba2, aba3 = st.tabs(["Geral", "Município", "Região"])
 
     with aba1:
-        resultano, resulttitulo, resultocorrencia = PypiInfoDash()
-        Pypigraphic(resultano, resultocorrencia)
+        resulttitulo, resultocorrencia = PypiInfoGeral()
+        PypigraphicGeral(resultocorrencia)
         PypiMetrics(resultocorrencia)
         PypiColorMetrics()
 
     with aba2:
-        PypiMetrics(resultocorrencia)
+        ...
 
     with aba3:
-        PypiMetrics(resultocorrencia)
+        ...
 
 
 if __name__ == "__main__":
