@@ -84,7 +84,7 @@ def PypiInfoGeral():
     Função para criar os selectbox de data(Ano) | Ocorrência.
     """
     # Colunas do Selectbox
-    col1 = st.columns((1))
+    (col1,) = st.columns((1))
 
     # Selectbox Título Ocorrência
     TITULODF = duckdb.query(
@@ -92,7 +92,7 @@ def PypiInfoGeral():
         FROM '{PATH_DESCRIPTIONS}'
         ORDER BY descricao"""
     ).to_df()
-    TITULO = col1.selectbox("​📝​Título da Ocorrência:", TITULODF)
+    TITULO = col1.selectbox("​📝​Título da Ocorrência:", TITULODF["descricao"], key="T1")
 
     # Título das ocorrências
     TITULOOCORRENCIADF = duckdb.query(
