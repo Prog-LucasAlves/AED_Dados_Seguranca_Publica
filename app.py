@@ -148,6 +148,7 @@ def PypigraphicGeral(tituloocorrencia):
         .encode(
             x=alt.X("Total:Q"),
             y=alt.Y("Ano:O", sort=None),
+            text=alt.Text("Total:Q", format=",.0f"),
         )
         .properties(height=200, width=200)
     )
