@@ -366,6 +366,7 @@ if __name__ == "__main__":
     PypiConfigPage()
     PypiTitle()
     PypiAttData()
+    main()
 
     # resultano, resulttitulo, resultocorrencia = PypiInfoDash()
     # totalgeral = Pypigraphic(resultano, resultocorrencia)
