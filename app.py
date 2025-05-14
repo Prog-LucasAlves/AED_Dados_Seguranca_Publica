@@ -354,12 +354,14 @@ def main():
     with aba1:
         resultano, resulttitulo, resultocorrencia = PypiInfoDash()
         Pypigraphic(resultano, resultocorrencia)
+        PypiMetrics(resultocorrencia)
+        PypiColorMetrics()
 
     with aba2:
-        ...
+        PypiMetrics(resultocorrencia)
 
     with aba3:
-        ...
+        PypiMetrics(resultocorrencia)
 
 
 if __name__ == "__main__":
