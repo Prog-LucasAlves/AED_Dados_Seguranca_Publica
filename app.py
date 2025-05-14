@@ -132,7 +132,7 @@ def PypigraphicGeral(tituloocorrencia):
     TITULOOCORRENCIA = tituloocorrencia
 
     # Colunas dos graficos
-    (col1,) = st.columns([1])
+    (col1, col2, col3) = st.columns([1, 1, 1])
 
     # Grafico de barras | Total de ocorrências por mês
     TOTALMESDF = duckdb.query(
@@ -149,7 +149,7 @@ def PypigraphicGeral(tituloocorrencia):
             x=alt.X("Total:Q"),
             y=alt.Y("Ano:O", sort=None),
         )
-        .properties(height=380, width=600)
+        .properties(height=200, width=200)
     )
 
     col1.altair_chart(chart, use_container_width=True, key="chart1")
