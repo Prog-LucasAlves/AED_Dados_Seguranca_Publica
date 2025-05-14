@@ -80,7 +80,7 @@ def PypiInfoGeral():
     Função para criar os selectbox de data(Ano) | Ocorrência.
     """
     # Colunas do Selectbox
-    (col1,) = st.columns((1))
+    (col1,) = st.columns([0.1])
 
     # Selectbox Título Ocorrência
     TITULODF = duckdb.query(
@@ -131,7 +131,7 @@ def PypigraphicGeral(tituloocorrencia):
     TITULOOCORRENCIA = tituloocorrencia
 
     # Colunas dos graficos
-    (col1,) = st.columns((1))
+    (col1,) = st.columns([1])
 
     # Grafico de barras | Total de ocorrências por mês
     TOTALMESDF = duckdb.query(
