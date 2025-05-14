@@ -358,10 +358,10 @@ def main():
         PypiColorMetrics()
 
     with aba2:
-        ...
+        PypiMetrics(resultocorrencia)
 
     with aba3:
-        ...
+        PypiMetrics(resultocorrencia)
 
 
 if __name__ == "__main__":
