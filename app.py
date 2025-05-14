@@ -216,79 +216,6 @@ def Pypigraphic(ano, tituloocorrencia):
     return TOTALGERALDF
 
 
-def PypiSidebar(ano, titulo, tituloocorrencia, totalgeral):
-    """
-    Função para criar a barra lateral do dashboard.
-    """
-
-    ANO = ano
-    TITULO = titulo
-    TITULOOCORRENCIA = tituloocorrencia
-    TOTALGERAL = totalgeral
-
-    st.sidebar.title("📊​Filtros")
-    st.sidebar.subheader(f"{ANO} | {TITULO}")
-
-    st.sidebar.markdown("---")
-
-    # Barra Lateral | Municípios
-    MUNICIPIOSDF = duckdb.query(
-        f"""SELECT DISTINCT fmun
-        FROM '{PATH_PARQUET}'
-        ORDER BY fmun"""
-    ).to_df()
-
-    # Selectbox Municípios
-    MUNICIPIO = st.sidebar.selectbox("🧭​Município:", MUNICIPIOSDF)
-
-    # Total de Ocorrências por Município
-    TOTALOCMUNICIPIODF = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
-        FROM '{PATH_PARQUET}'
-        WHERE ano = '{ANO}' AND fmun = '{MUNICIPIO}'
-        """
-    ).to_df()
-
-    TOTALOCMUNICIPIO = st.sidebar.text(
-        f"Total de Ocorrências: {TOTALOCMUNICIPIODF.iloc[0, 0]:.0f}"
-    )
-
-    # Representatividade das Ocorrências por Município
-    REPRESENTMUNICIPIO = TOTALOCMUNICIPIODF.iloc[0, 0] / TOTALGERAL["Total"].sum()
-    st.sidebar.text(f"Representatividade: {REPRESENTMUNICIPIO:.2%}")
-
-    st.sidebar.markdown("---")
-
-    # Barra lateral Região
-    REGIAODF = duckdb.query(
-        f"""SELECT DISTINCT regiao
-        FROM '{PATH_PARQUET}'
-        ORDER BY regiao
-        """
-    ).to_df()
-
-    # Selectbox Região
-    REGIAO = st.sidebar.selectbox("🧭​Região:", REGIAODF)
-
-    # Total de Ocorrências por Região
-    TOTALOCREGIAODF = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
-        FROM '{PATH_PARQUET}'
-        WHERE ano = '{ANO}' AND regiao = '{REGIAO}'
-        """
-    ).to_df()
-
-    TOTALOCREGIAO = st.sidebar.text(
-        f"Total de Ocorrências: {TOTALOCREGIAODF.iloc[0, 0]:.0f}"
-    )
-
-    # Representatividade das Ocorrências por Região
-    REPRESENTREGIAO = TOTALOCREGIAODF.iloc[0, 0] / TOTALGERAL["Total"].sum()
-    st.sidebar.text(f"Representatividade: {REPRESENTREGIAO:.2%}")
-
-    return MUNICIPIO, TOTALOCMUNICIPIO, REGIAO, TOTALOCREGIAO
-
-
 def PypiMetrics(tituloocorrencia):
     """
     Função para criar as métricas do dashboard.
@@ -302,7 +229,7 @@ def PypiMetrics(tituloocorrencia):
     font-size: 20px;
     font-weight: bolder;
     font-family: Arial, Helvetica, sans-serif; "
-> 📋​Comparativo Anual de Ocorrências: 2024 | 2023 | 2022 | 2021 </p>
+> 📋​Comparativo Anual de Ocorrências: 2025 | 2024 | 2023 | 2022 | 2021 </p>
 """
     st.markdown(T, unsafe_allow_html=True)
 
@@ -419,12 +346,29 @@ div[data-testid="stMetricValue"] > label[data-testid="stMetricLabel"] > div {
     )
 
 
+def main():
+    "Função principal para executar o dashboard."
+
+    aba1, aba2, aba3 = st.tabs(["Geral", "Município", "Região"])
+
+    with aba1:
+        resultano, resulttitulo, resultocorrencia = PypiInfoDash()
+        Pypigraphic(resultano, resultocorrencia)
+
+    with aba2:
+        ...
+
+    with aba3:
+        ...
+
+
 if __name__ == "__main__":
     PypiConfigPage()
     PypiTitle()
     PypiAttData()
-    resultano, resulttitulo, resultocorrencia = PypiInfoDash()
-    totalgeral = Pypigraphic(resultano, resultocorrencia)
-    PypiSidebar(resultano, resulttitulo, resultocorrencia, totalgeral)
-    PypiMetrics(resultocorrencia)
-    PypiColorMetrics()
+
+    # resultano, resulttitulo, resultocorrencia = PypiInfoDash()
+    # totalgeral = Pypigraphic(resultano, resultocorrencia)
+
+    # PypiMetrics(resultocorrencia)
+    # PypiColorMetrics()
