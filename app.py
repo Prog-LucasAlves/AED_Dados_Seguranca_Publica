@@ -6,6 +6,7 @@ Dashboard Dados Segurança Pública do RJ
 import streamlit as st
 from PIL import Image
 import duckdb
+import altair as alt
 
 # Diretório dos Dados
 # Caminho do arquivo parquet com os dados
@@ -141,17 +142,17 @@ def PypigraphicGeral(tituloocorrencia):
         ORDER BY ano"""
     ).to_df()
 
-    col1.bar_chart(
-        data=TOTALMESDF,
-        x="Ano",
-        y="Total",
-        color="#3CB371",
-        horizontal=True,
-        width=1,
-        height=380,
-        use_container_width=True,
-        key="T2",
+    chart = (
+        alt.Chart(TOTALMESDF)
+        .mark_bar(color="#3CB371")
+        .encode(
+            x=alt.X("Total:Q"),
+            y=alt.Y("Ano:O", sort=None),
+        )
+        .properties(height=380, width=600)
     )
+
+    col1.altair_chart(chart, use_container_width=True, key="chart1")
 
     st.divider()
 
