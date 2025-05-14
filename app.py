@@ -3,13 +3,9 @@ Dashboard Dados Segurança Pública do RJ
 """
 
 # Bibliotecas utilizadas
-import folium.map
 import streamlit as st
 from PIL import Image
 import duckdb
-import folium
-from streamlit_folium import st_folium
-from branca.colormap import linear
 
 # Diretório dos Dados
 # Caminho do arquivo parquet com os dados
@@ -135,7 +131,7 @@ def PypigraphicGeral(tituloocorrencia):
     TITULOOCORRENCIA = tituloocorrencia
 
     # Colunas dos graficos
-    col3, col4 = st.columns((1, 2))
+    (col1,) = st.columns((1))
 
     # Grafico de barras | Total de ocorrências por mês
     TOTALMESDF = duckdb.query(
@@ -145,7 +141,7 @@ def PypigraphicGeral(tituloocorrencia):
         ORDER BY ano"""
     ).to_df()
 
-    col3.bar_chart(
+    col1.bar_chart(
         data=TOTALMESDF,
         x="Ano",
         y="Total",
@@ -154,55 +150,10 @@ def PypigraphicGeral(tituloocorrencia):
         width=1,
         height=380,
         use_container_width=True,
+        key="T2",
     )
 
     st.divider()
-
-    # Criando Mapa
-
-    # Criando Informação com o Total de Ocorrências por Munic
-    TOTALGERALDF = duckdb.query(
-        f"""SELECT ano, fmun, fmun_cod, SUM({TITULOOCORRENCIA})
-        FROM '{PATH_PARQUET}'
-        GROUP BY ano, fmun, fmun_cod
-        """
-    ).to_df()
-
-    TOTALGERALDF.columns = ["Ano", "Município", "Município_cod", "Total"]
-    TOTALGERALDF["Município_cod"] = TOTALGERALDF["Município_cod"].astype(str)
-    TOTALTITULODFINDEX = TOTALGERALDF.set_index("Município_cod")["Total"]
-
-    with col4:
-        colormap = linear.YlGn_09.scale(
-            TOTALGERALDF["Total"].min(), TOTALGERALDF["Total"].max()
-        )
-
-        color_dict = {
-            key: colormap(TOTALTITULODFINDEX[key]) for key in TOTALTITULODFINDEX.keys()
-        }
-
-        M = folium.Map(location=([-22.10, -42.48]), zoom_start=7)
-
-        folium.GeoJson(
-            PATH_MAPA,
-            name="geojson",
-            zoom_on_click=True,
-            style_function=lambda feature: {
-                "fillColor": color_dict[feature["id"]],
-                "color": "black",
-                "weight": 0.3,
-                "fillOpacity": 0.5,
-            },
-        ).add_to(M)
-
-        colormap.caption = ""
-        colormap.add_to(M)
-
-        st_folium(M, height=350, width=570)
-
-        folium.LayerControl().add_to(M)
-
-    return TOTALGERALDF
 
 
 def PypiMetrics(tituloocorrencia):
