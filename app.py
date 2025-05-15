@@ -148,8 +148,9 @@ def PypigraphicGeral(tituloocorrencia):
         .encode(
             x=alt.X("Total:Q"),
             y=alt.Y("Ano:O", sort=None),
+            text=alt.Text("Total:Q", format=",.0f"),
         )
-        .properties(height=200, width=200)
+        .properties(height=400, width=200)
     )
 
     col1.altair_chart(chart, use_container_width=True, key="chart1")
