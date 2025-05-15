@@ -78,8 +78,20 @@ def PypiAttData():
 
 def PypiInfoGeral():
     """
-    Função para criar os selectbox de data(Ano) | Ocorrência.
+    Função para criar os selectbox de | Ocorrência.
     """
+    # CSS para reduzir o tamanho do selectbox
+    st.markdown(
+        """
+            <style>
+            #T1 {
+                max-width: 300px;
+            }
+            </style>
+            """,
+        unsafe_allow_html=True,
+    )
+
     # Colunas do Selectbox
     (col1,) = st.columns([0.1])
 
