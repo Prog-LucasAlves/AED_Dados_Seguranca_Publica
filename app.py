@@ -16,6 +16,9 @@ PATH_PARQUET = "./data/raw_data/GOLDEN/GOLDEN_data.parquet"
 # Caminho do arquivo com as descrições das variáveis
 PATH_DESCRIPTIONS = "./data/dict_data/tipo_ocorrencia.csv"
 
+# Caminho do arquivo com os nomes dos municipios
+PATH_MUNICIPIOS = "./data/dict_data/municipio.csv"
+
 # Caminho do arquivo com as coordenadas geográficas dos municipios de RJ
 PATH_MAPA = "./data/map/geojs-33-mun.json"
 
@@ -357,7 +360,7 @@ def PypigraphicGeral(tituloocorrencia):
     st.divider()
 
 
-def PypiInfomunicio():
+def PypiInfoMunicio():
     """
     Função para criar os selectbox de | Município e Ocorrencias.
     """
@@ -401,15 +404,132 @@ def PypiInfomunicio():
         "​📝​Título da Ocorrência:", TITULODFM["descricao"], key="T2"
     )
 
+    # Título das ocorrências
+    TITULOOCORRENCIADF = duckdb.query(
+        f"""SELECT tipo_ocorrencia
+        FROM '{PATH_DESCRIPTIONS}'
+        WHERE descricao = '{TITULOM}'"""
+    ).to_df()
+
+    TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
+
     # Selectbox Município
     MUNICIPIODFM = duckdb.query(
-        f"""SELECT DISTINCT fmun
-        FROM '{PATH_PARQUET}'
-        ORDER BY fmun"""
+        f"""SELECT DISTINCT descricao
+        FROM '{PATH_MUNICIPIOS}'
+        ORDER BY descricao"""
     ).to_df()
-    MUNICIPIOM = col2.selectbox("​🗺️​Município:", MUNICIPIODFM["fmun"], key="T3")
 
-    return TITULOM, MUNICIPIOM
+    MUNICIPIOM = col2.selectbox("​🗺️​Município:", MUNICIPIODFM["descricao"], key="T3")
+
+    # Titulo do município
+    MUNICIPIOOCORRENCIADF = duckdb.query(
+        f"""SELECT DISTINCT tipo_ocorrencia
+        FROM '{PATH_MUNICIPIOS}'
+        WHERE descricao = '{MUNICIPIOM}'"""
+    ).to_df()
+
+    TITULOMUNICIPIO = MUNICIPIOOCORRENCIADF.iloc[0, 0]
+
+    return TITULOOCORRENCIA, TITULOMUNICIPIO
+
+
+def PypigraphicMunicio(titulo, municipio):
+    """
+    Função para criar os gráficos(Barras | Heatmap) para o município.
+    """
+
+    # CSS espaçamento entre os gráficos
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stVerticalBlock"] {
+        padding-right: 60px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    TITULO = titulo
+    MUNICIPIO = municipio
+
+    # Colunas dos graficos
+    (col1, col2, col3) = st.columns([1, 1, 1])
+
+    # Grafico de barras | Total de ocorrências por ano e município
+    TOTALANOMUNICIPIODF = duckdb.query(
+        f"""SELECT ano AS Ano, SUM({TITULO}) AS Total
+        FROM '{PATH_PARQUET}'
+        WHERE fmun = '{MUNICIPIO}'
+        GROUP BY ano"""
+    ).to_df()
+
+    TOTALANOMUNICIPIODF["Total_fmt"] = TOTALANOMUNICIPIODF["Total"].apply(
+        lambda x: f"{x:,.0f}".replace(",", ".")
+    )
+
+    MEDIAMUNICIPIODF = TOTALANOMUNICIPIODF["Total"].mean()
+    x_scale = alt.Scale(domain=[0, TOTALANOMUNICIPIODF["Total"].max() * 1.1])
+
+    chart = (
+        alt.Chart(TOTALANOMUNICIPIODF)
+        .mark_bar(color="#3CB371")
+        .encode(
+            x=alt.X(
+                "Total:Q",
+                axis=alt.Axis(
+                    title="Total de Ocorrências",
+                    format=",.0f",
+                    labelExpr="replace(datum.label, ',', '.')",
+                    labelFontSize=14,
+                    titleFontSize=18,
+                ),
+            ),
+            y=alt.Y(
+                "Ano:O",
+                sort=None,
+                axis=alt.Axis(
+                    labelFontSize=14,
+                    titleFontSize=18,
+                ),
+            ),
+        )
+        + alt.Chart(TOTALANOMUNICIPIODF)
+        .mark_text(
+            align="right",
+            baseline="middle",
+            dx=0,
+            color="black",
+            fontSize=14,
+        )
+        .encode(
+            x="Total:Q",
+            y=alt.Y("Ano:O", sort=None),
+            text=alt.Text("Total_fmt:N"),
+        )
+        + alt.Chart(pd.DataFrame({"media": [MEDIAMUNICIPIODF]}))
+        .mark_rule(
+            color="#d62728",
+            strokeWidth=2,
+            strokeDash=[5, 5],
+        )
+        .encode(x=alt.X("media:Q", scale=x_scale, title=""))
+        + alt.Chart(pd.DataFrame({"media": [MEDIAMUNICIPIODF]}))
+        .mark_text(
+            text=f"Média de Ocorrências: {MEDIAMUNICIPIODF:,.0f}".replace(",", "."),
+            color="#d62728",
+            fontSize=14,
+            dx=0,
+            dy=-10,
+        )
+        .encode(
+            x=alt.X("media:Q", scale=x_scale, title=""),
+            y=alt.value(0),
+        )
+    ).properties(height=400, width=800)
+
+    col1.altair_chart(chart, use_container_width=True, key="chart4")
 
 
 def PypiMetrics(titulo, tituloocorrencia):
@@ -568,7 +688,8 @@ def main():
         PypiColorMetrics()
 
     with aba2:
-        resulttitulo = PypiInfomunicio()
+        resulttitulo, resultocorrencia = PypiInfoMunicio()
+        PypigraphicMunicio(resulttitulo, resultocorrencia)
 
     with aba3:
         ...
