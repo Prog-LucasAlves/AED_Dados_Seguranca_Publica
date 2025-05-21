@@ -531,8 +531,226 @@ def PypigraphicMunicio(titulo, municipio):
 
     col1.altair_chart(chart, use_container_width=True, key="chart4")
 
+    # Grafico de heatmap | Total de ocorrências por mes e ano
+    TOTALANOMESMUNICIPIODF = duckdb.query(
+        f"""SELECT mes, ano, SUM({TITULO}) AS Total
+        FROM '{PATH_PARQUET}'
+        WHERE fmun = '{MUNICIPIO}'
+        GROUP BY mes, ano
+        ORDER BY ano, mes"""
+    ).to_df()
 
-def PypiMetrics(titulo, tituloocorrencia):
+    TOTALANOMESMUNICIPIODF["Total_fmt"] = TOTALANOMESMUNICIPIODF["Total"].apply(
+        lambda x: f"{x:,.0f}".replace(",", ".")
+    )
+    MAXTOTAL = TOTALANOMESMUNICIPIODF["Total"].max()
+    BINS = list(range(0, int(MAXTOTAL + 1000), 50))
+    LABELS = [f"{i+1} - {i+50}" if i > 0 else "0 - 50" for i in BINS[:-1]]
+
+    TOTALANOMESMUNICIPIODF["Total_bin"] = pd.cut(
+        TOTALANOMESMUNICIPIODF["Total"], bins=BINS, labels=LABELS, include_lowest=True
+    )
+
+    TOTALANOMESMUNICIPIODF["Total_bin"] = TOTALANOMESMUNICIPIODF[
+        "Total_bin"
+    ].cat.add_categories("Fora do intervalo")
+    TOTALANOMESMUNICIPIODF["Total_bin"] = TOTALANOMESMUNICIPIODF["Total_bin"].fillna(
+        "Fora do intervalo"
+    )
+
+    chart = (
+        alt.Chart(TOTALANOMESMUNICIPIODF)
+        .mark_rect()
+        .encode(
+            x=alt.X(
+                "mes:O",
+                title="Mês",
+                axis=alt.Axis(
+                    labelAngle=0,
+                    labelFontSize=14,
+                    titleFontSize=18,
+                ),
+            ),
+            y=alt.Y(
+                "ano:O",
+                title="Ano",
+                axis=alt.Axis(
+                    labelFontSize=14,
+                    titleFontSize=18,
+                ),
+            ),
+            color=alt.Color(
+                "Total_bin:N",
+                scale=alt.Scale(scheme="greens"),
+                sort=LABELS + ["Fora do intervalo"],
+                title="Total de Ocorrências",
+                legend=alt.Legend(
+                    labelFontSize=14,
+                    titleFontSize=18,
+                    orient="right",
+                    titleOrient="top",
+                    titlePadding=10,
+                    labelPadding=5,
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip("ano:O", title="Ano"),
+                alt.Tooltip("mes:O", title="Mês"),
+                alt.Tooltip("Total:N", title="Total"),
+            ],
+        )
+        .properties(height=400, width=800)
+    )
+
+    col2.altair_chart(chart, use_container_width=True, key="chart5")
+
+    chart = (
+        alt.Chart(TOTALANOMESMUNICIPIODF)
+        .mark_boxplot(color="seagreen")
+        .encode(
+            x=alt.X(
+                "mes:O",
+                title="Mês",
+                axis=alt.Axis(labelAngle=0, labelFontSize=14, titleFontSize=18),
+            ),
+            y=alt.Y("Total:Q", title="Total de Ocorrências"),
+            tooltip=["ano", "mes", "Total"],
+        )
+    ).properties(width=800, height=400)
+
+    col3.altair_chart(chart, use_container_width=True, key="chart6")
+
+    chart = (
+        alt.Chart(TOTALANOMESMUNICIPIODF)
+        .mark_area()
+        .encode(
+            x=alt.X("mes:O", title="Mês"),
+            y=alt.Y("Total:Q", stack="normalize", title="Proporção"),
+            color=alt.Color("ano:O", title="Ano"),
+            tooltip=["ano", "mes", "Total"],
+        )
+    ).properties(width=800, height=400)
+
+    col1.altair_chart(chart, use_container_width=True, key="chart7")
+
+    chart = (
+        alt.Chart(TOTALANOMESMUNICIPIODF)
+        .mark_circle(size=60, opacity=0.4, color="green")
+        .encode(
+            x=alt.X("mes:O", title="Mês"),
+            y=alt.Y("Total:Q", title="Total de Ocorrências"),
+            tooltip=["ano", "mes", "Total"],
+        )
+    ).properties(width=800, height=400)
+
+    col2.altair_chart(chart, use_container_width=True, key="chart8")
+
+
+def PypiMetricsMunicipio(titulo, municipio):
+    """
+    Função para criar as métricas do dashboard.
+    """
+
+    TITULO = titulo
+    MUNICIPIO = municipio
+
+    T = f"""
+    <p style="
+    font-size: 20px;
+    font-weight: bolder;"
+> 📋​Comparativo Anual de Ocorrências |
+        <span style="color:#d62728">{TITULO.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
+    """
+    st.markdown(T, unsafe_allow_html=True)
+
+    col1, col2, col3, col4, col5 = st.columns((1, 1, 1, 1, 1))
+
+    TOTALOC2020 = duckdb.query(
+        f"""SELECT SUM({TITULO})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2020' AND fmun = '{MUNICIPIO}'
+        """
+    ).to_df()
+
+    TOTALOC2021 = duckdb.query(
+        f"""SELECT SUM({TITULO})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2021' AND fmun = '{MUNICIPIO}'
+        """
+    ).to_df()
+
+    DIFFOC2021 = (TOTALOC2021 / TOTALOC2020) - 1
+
+    col5.metric(
+        label="⌛Total de Ocorrências em 2021:",
+        value=f"{TOTALOC2021.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2021.iloc[0, 0]:.2%}",
+    )
+
+    TOTALOC2022 = duckdb.query(
+        f"""SELECT SUM({TITULO})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2022' AND fmun = '{MUNICIPIO}'
+        """
+    ).to_df()
+
+    DIFFOC2122 = (TOTALOC2022 / TOTALOC2021) - 1
+
+    col4.metric(
+        label="⌛Total de Ocorrências em 2022:",
+        value=f"{TOTALOC2022.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2122.iloc[0, 0]:.2%}",
+    )
+
+    TOTALOC2023 = duckdb.query(
+        f"""SELECT SUM({TITULO})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2023' AND fmun = '{MUNICIPIO}'
+        """
+    ).to_df()
+
+    DIFFOC2322 = (TOTALOC2023 / TOTALOC2022) - 1
+
+    col3.metric(
+        label="⌛Total de Ocorrências em 2023:",
+        value=f"{TOTALOC2023.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2322.iloc[0, 0]:.2%}",
+    )
+
+    TOTALOC2024 = duckdb.query(
+        f"""SELECT SUM({TITULO})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2024' AND fmun = '{MUNICIPIO}'
+        """
+    ).to_df()
+
+    DIFFOC2423 = (TOTALOC2024 / TOTALOC2023) - 1
+
+    col2.metric(
+        label="⌛Total de Ocorrências em 2024:",
+        value=f"{TOTALOC2024.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2423.iloc[0, 0]:.2%}",
+    )
+
+    TOATALOC2025 = duckdb.query(
+        f"""SELECT SUM({TITULO})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2025' AND fmun = '{MUNICIPIO}'
+        """
+    ).to_df()
+
+    DIFFOC2524 = (TOATALOC2025 / TOTALOC2024) - 1
+
+    col1.metric(
+        label="⌛Total de Ocorrências em 2025:",
+        value=f"{TOATALOC2025.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2524.iloc[0, 0]:.2%}",
+    )
+
+    st.markdown("---")
+
+
+def PypiMetricsGeral(titulo, tituloocorrencia):
     """
     Função para criar as métricas do dashboard.
     """
@@ -684,12 +902,13 @@ def main():
     with aba1:
         resulttitulo, resultocorrencia = PypiInfoGeral()
         PypigraphicGeral(resultocorrencia)
-        PypiMetrics(resulttitulo, resultocorrencia)
+        PypiMetricsGeral(resulttitulo, resultocorrencia)
         PypiColorMetrics()
 
     with aba2:
         resulttitulo, resultocorrencia = PypiInfoMunicio()
         PypigraphicMunicio(resulttitulo, resultocorrencia)
+        PypiMetricsMunicipio(resulttitulo, resultocorrencia)
 
     with aba3:
         ...
