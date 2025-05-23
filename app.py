@@ -19,9 +19,6 @@ PATH_DESCRIPTIONS = "./data/dict_data/tipo_ocorrencia.csv"
 # Caminho do arquivo com os nomes dos municipios
 PATH_MUNICIPIOS = "./data/dict_data/municipio.csv"
 
-# Caminho do arquivo com as coordenadas geográficas dos municipios de RJ
-PATH_MAPA = "./data/map/geojs-33-mun.json"
-
 
 def PypiConfigPage():
     """
@@ -30,7 +27,7 @@ def PypiConfigPage():
     img = Image.open("./image/4744315.png")
 
     st.set_page_config(
-        page_title="Em Construção",
+        page_title="Dados da Segurança Pública do Estado do RJ",
         page_icon=img,
         layout="wide",
         initial_sidebar_state="expanded",
@@ -360,7 +357,7 @@ def PypigraphicGeral(tituloocorrencia):
     st.divider()
 
 
-def PypiInfoMunicio():
+def PypiInfoMunicipio():
     """
     Função para criar os selectbox de | Município e Ocorrencias.
     """
@@ -431,10 +428,32 @@ def PypiInfoMunicio():
 
     TITULOMUNICIPIO = MUNICIPIOOCORRENCIADF.iloc[0, 0]
 
-    return TITULOOCORRENCIA, TITULOMUNICIPIO
+    # Observação sobre o título da ocorrência
+    if TITULOM == "Crimes Violentos Letais Intencionais*":
+        CVLI = """
+<p style="color:DimGrey; font-size: 14px; font-weight: bolder;"
+> *Crimes Violentos Letais Intencionais: Homicídio doloso + Lesão corporal seguida de morte + Latrocínio. </p>
+"""
+        st.markdown(CVLI, unsafe_allow_html=True)
+
+    elif TITULOM == "Letalidade Violenta*":
+        LV = """
+<p style="color:DimGrey; font-size: 14px; font-weight: bolder;"
+> *Homicídio doloso + Lesão corporal seguida de morte + Latrocínio + Morte por intervenção de agente do Estado. </p>
+"""
+        st.markdown(LV, unsafe_allow_html=True)
+
+    elif TITULOM == "Homicídio Culposo (Trânsito)*":
+        LV = """
+<p style="color:DimGrey; font-size: 14px; font-weight: bolder;"
+> *Atropelamento + colisão + outros. </p>
+"""
+        st.markdown(LV, unsafe_allow_html=True)
+
+    return TITULOOCORRENCIA, TITULOMUNICIPIO, TITULOM
 
 
-def PypigraphicMunicio(titulo, municipio):
+def PypigraphicMunicipio(titulo, municipio):
     """
     Função para criar os gráficos(Barras | Heatmap) para o município.
     """
@@ -613,53 +632,36 @@ def PypigraphicMunicio(titulo, municipio):
                 title="Mês",
                 axis=alt.Axis(labelAngle=0, labelFontSize=14, titleFontSize=18),
             ),
-            y=alt.Y("Total:Q", title="Total de Ocorrências"),
+            y=alt.Y(
+                "Total:Q",
+                title="Total de Ocorrências",
+                axis=alt.Axis(
+                    labelFontSize=14,
+                    titleFontSize=18,
+                ),
+            ),
             tooltip=["ano", "mes", "Total"],
         )
     ).properties(width=800, height=400)
 
     col3.altair_chart(chart, use_container_width=True, key="chart6")
 
-    chart = (
-        alt.Chart(TOTALANOMESMUNICIPIODF)
-        .mark_area()
-        .encode(
-            x=alt.X("mes:O", title="Mês"),
-            y=alt.Y("Total:Q", stack="normalize", title="Proporção"),
-            color=alt.Color("ano:O", title="Ano"),
-            tooltip=["ano", "mes", "Total"],
-        )
-    ).properties(width=800, height=400)
 
-    col1.altair_chart(chart, use_container_width=True, key="chart7")
-
-    chart = (
-        alt.Chart(TOTALANOMESMUNICIPIODF)
-        .mark_circle(size=60, opacity=0.4, color="green")
-        .encode(
-            x=alt.X("mes:O", title="Mês"),
-            y=alt.Y("Total:Q", title="Total de Ocorrências"),
-            tooltip=["ano", "mes", "Total"],
-        )
-    ).properties(width=800, height=400)
-
-    col2.altair_chart(chart, use_container_width=True, key="chart8")
-
-
-def PypiMetricsMunicipio(titulo, municipio):
+def PypiMetricsMunicipio(titulo, municipio, titulo2):
     """
     Função para criar as métricas do dashboard.
     """
 
     TITULO = titulo
     MUNICIPIO = municipio
+    TITULO2 = titulo2
 
     T = f"""
     <p style="
     font-size: 20px;
     font-weight: bolder;"
 > 📋​Comparativo Anual de Ocorrências |
-        <span style="color:#d62728">{TITULO.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
+        <span style="color:#d62728">{TITULO2.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
     """
     st.markdown(T, unsafe_allow_html=True)
 
@@ -906,9 +908,9 @@ def main():
         PypiColorMetrics()
 
     with aba2:
-        resulttitulo, resultocorrencia = PypiInfoMunicio()
-        PypigraphicMunicio(resulttitulo, resultocorrencia)
-        PypiMetricsMunicipio(resulttitulo, resultocorrencia)
+        resulttitulo, resultocorrencia, resulttitulo2 = PypiInfoMunicipio()
+        PypigraphicMunicipio(resulttitulo, resultocorrencia)
+        PypiMetricsMunicipio(resulttitulo, resultocorrencia, resulttitulo2)
 
     with aba3:
         ...
