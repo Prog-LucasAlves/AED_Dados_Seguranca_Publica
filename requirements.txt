@@ -1,5 +1,5 @@
-streamlit==1.38.0
-duckdb==1.0.0
+streamlit==1.53.0
+duckdb==1.4.3
 folium==0.17.0
 streamlit-folium==0.22.0
 streamlit-extras==0.4.7

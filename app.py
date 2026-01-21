@@ -525,7 +525,8 @@ def PypiInfoMunicipio():
             delim=';',
             header=true,
             strict_mode=false,
-            ignore_errors=true
+            ignore_errors=true,
+            encoding='utf-8'
         )
         ORDER BY descricao
     """).to_df()
