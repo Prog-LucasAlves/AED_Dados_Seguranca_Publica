@@ -19,6 +19,9 @@ PATH_DESCRIPTIONS = "./data/dict_data/tipo_ocorrencia.csv"
 # Caminho do arquivo com os nomes dos municipios
 PATH_MUNICIPIOS = "./data/dict_data/municipio.csv"
 
+# Caminho do arquivo com os nomes das regiões
+PATH_REGIOES = "./data/dict_data/regiao.csv"
+
 
 def PypiConfigPage():
     """
@@ -244,7 +247,7 @@ def PypigraphicGeral(tituloocorrencia):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, use_container_width=True, key="chart1")
+    col1.altair_chart(chart, width="content", key="chart1")
 
     # Grafico de heatmap | Total de ocorrências por mes e ano
 
@@ -318,7 +321,7 @@ def PypigraphicGeral(tituloocorrencia):
         .properties(height=400, width=800)
     )
 
-    col2.altair_chart(chart, use_container_width=True, key="chart2")
+    col2.altair_chart(chart, width="content", key="chart2")
 
     # Grafico de linha  | Total de ocorrências por mes e ano
 
@@ -352,9 +355,113 @@ def PypigraphicGeral(tituloocorrencia):
         .properties(height=400, width=800)
     )
 
-    col3.altair_chart(chart, use_container_width=True, key="chart3")
+    col3.altair_chart(chart, width="content", key="chart3")
 
     st.divider()
+
+
+def PypiMetricsGeral(titulo, tituloocorrencia):
+    """
+    Função para criar as métricas do dashboard.
+    """
+
+    TITULO = titulo
+    TITULOOCORRENCIA = tituloocorrencia
+
+    T = f"""
+    <p style="
+    font-size: 20px;
+    font-weight: bolder;"
+> 📋​Comparativo Anual de Ocorrências |
+        <span style="color:#d62728">{TITULO.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
+    """
+    st.markdown(T, unsafe_allow_html=True)
+
+    col1, col2, col3, col4, col5 = st.columns((1, 1, 1, 1, 1))
+
+    TOTALOC2020 = duckdb.query(
+        f"""SELECT SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2020'
+        """
+    ).to_df()
+
+    TOTALOC2021 = duckdb.query(
+        f"""SELECT SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2021'
+        """
+    ).to_df()
+
+    DIFFOC2021 = (TOTALOC2020 / TOTALOC2021) - 1
+
+    col5.metric(
+        label="⌛Total de Ocorrências em 2021:",
+        value=f"{TOTALOC2021.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2021.iloc[0, 0]:.2%}",
+    )
+
+    TOTALOC2022 = duckdb.query(
+        f"""SELECT SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2022'
+        """
+    ).to_df()
+
+    DIFFOC2122 = (TOTALOC2022 / TOTALOC2021) - 1
+
+    col4.metric(
+        label="⌛Total de Ocorrências em 2022:",
+        value=f"{TOTALOC2022.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2122.iloc[0, 0]:.2%}",
+    )
+
+    TOTALOC2023 = duckdb.query(
+        f"""SELECT SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2023'
+        """
+    ).to_df()
+
+    DIFFOC2322 = (TOTALOC2023 / TOTALOC2022) - 1
+
+    col3.metric(
+        label="⌛Total de Ocorrências em 2023:",
+        value=f"{TOTALOC2023.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2322.iloc[0, 0]:.2%}",
+    )
+
+    TOTALOC2024 = duckdb.query(
+        f"""SELECT SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2024'
+        """
+    ).to_df()
+
+    DIFFOC2423 = (TOTALOC2024 / TOTALOC2023) - 1
+
+    col2.metric(
+        label="⌛Total de Ocorrências em 2024:",
+        value=f"{TOTALOC2024.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2423.iloc[0, 0]:.2%}",
+    )
+
+    TOATALOC2025 = duckdb.query(
+        f"""SELECT SUM({TITULOOCORRENCIA})
+        FROM '{PATH_PARQUET}'
+        WHERE ano = '2025'
+        """
+    ).to_df()
+
+    DIFFOC2524 = (TOATALOC2025 / TOTALOC2024) - 1
+
+    col1.metric(
+        label="⌛Total de Ocorrências em 2025:",
+        value=f"{TOATALOC2025.iloc[0, 0]:,.0f}".replace(",", "."),
+        delta=f"{DIFFOC2524.iloc[0, 0]:.2%}",
+    )
+
+    st.markdown("---")
 
 
 def PypiInfoMunicipio():
@@ -411,22 +518,23 @@ def PypiInfoMunicipio():
     TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
 
     # Selectbox Município
-    MUNICIPIODFM = duckdb.query(
-        f"""SELECT DISTINCT descricao
-        FROM '{PATH_MUNICIPIOS}'
-        ORDER BY descricao"""
-    ).to_df()
+    MUNICIPIODFM = duckdb.query(f"""
+        SELECT DISTINCT descricao
+        FROM read_csv(
+            '{PATH_MUNICIPIOS}',
+            delim=';',
+            header=true,
+            strict_mode=false,
+            ignore_errors=true,
+            encoding='utf-8'
+        )
+        ORDER BY descricao
+    """).to_df()
 
     MUNICIPIOM = col2.selectbox("​🗺️​Município:", MUNICIPIODFM["descricao"], key="T3")
 
     # Titulo do município
-    MUNICIPIOOCORRENCIADF = duckdb.query(
-        f"""SELECT DISTINCT tipo_ocorrencia
-        FROM '{PATH_MUNICIPIOS}'
-        WHERE descricao = '{MUNICIPIOM}'"""
-    ).to_df()
-
-    TITULOMUNICIPIO = MUNICIPIOOCORRENCIADF.iloc[0, 0]
+    TITULOMUNICIPIO = MUNICIPIOM
 
     # Observação sobre o título da ocorrência
     if TITULOM == "Crimes Violentos Letais Intencionais*":
@@ -548,7 +656,7 @@ def PypigraphicMunicipio(titulo, municipio):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, use_container_width=True, key="chart4")
+    col1.altair_chart(chart, width="content", key="chart4")
 
     # Grafico de heatmap | Total de ocorrências por mes e ano
     TOTALANOMESMUNICIPIODF = duckdb.query(
@@ -621,7 +729,7 @@ def PypigraphicMunicipio(titulo, municipio):
         .properties(height=400, width=800)
     )
 
-    col2.altair_chart(chart, use_container_width=True, key="chart5")
+    col2.altair_chart(chart, width="content", key="chart5")
 
     chart = (
         alt.Chart(TOTALANOMESMUNICIPIODF)
@@ -644,7 +752,7 @@ def PypigraphicMunicipio(titulo, municipio):
         )
     ).properties(width=800, height=400)
 
-    col3.altair_chart(chart, use_container_width=True, key="chart6")
+    col3.altair_chart(chart, width="content", key="chart6")
 
 
 def PypiMetricsMunicipio(titulo, municipio, titulo2):
@@ -752,40 +860,229 @@ def PypiMetricsMunicipio(titulo, municipio, titulo2):
     st.markdown("---")
 
 
-def PypiMetricsGeral(titulo, tituloocorrencia):
+def PypiInfoRegiao():
+    """
+    Função para criar os selectbox de | Região e Ocorrencias.
+    """
+
+    # CSS para reduzir o tamanho do selectbox
+    st.markdown(
+        """
+        <style>
+        div[data-baseweb="select"] {
+            max-width: 600px;
+            font-size: 17px !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # CSS para o titulo do selectbox
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stSelectbox"] label p {
+            font-size: 17px !important;
+            font-weight: bold !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Colunas do Selectbox
+    (col1, col2) = st.columns([1, 1])
+
+    # Selectbox Título Ocorrência
+    TITULODFM = duckdb.query(
+        f"""SELECT descricao
+        FROM '{PATH_DESCRIPTIONS}'
+        ORDER BY descricao"""
+    ).to_df()
+    TITULOM = col1.selectbox(
+        "​📝​Título da Ocorrência:", TITULODFM["descricao"], key="T4"
+    )
+
+    # Título das ocorrências
+    TITULOOCORRENCIADF = duckdb.query(
+        f"""SELECT tipo_ocorrencia
+        FROM '{PATH_DESCRIPTIONS}'
+        WHERE descricao = '{TITULOM}'"""
+    ).to_df()
+
+    TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
+
+    # Selectbox regiao
+    REGIAODFM = duckdb.query(
+        f"""SELECT DISTINCT descricao
+        FROM '{PATH_REGIOES}'
+        ORDER BY descricao"""
+    ).to_df()
+
+    REGIAOM = col2.selectbox("​🗺️​Região:", REGIAODFM, key="T5")
+
+    # Titulo do município
+    TITULOREGIAO = REGIAOM
+
+    # Observação sobre o título da ocorrência
+    if TITULOM == "Crimes Violentos Letais Intencionais*":
+        CVLI = """
+<p style="color:DimGrey; font-size: 14px; font-weight: bolder;"
+> *Crimes Violentos Letais Intencionais: Homicídio doloso + Lesão corporal seguida de morte + Latrocínio. </p>
+"""
+        st.markdown(CVLI, unsafe_allow_html=True)
+
+    elif TITULOM == "Letalidade Violenta*":
+        LV = """
+<p style="color:DimGrey; font-size: 14px; font-weight: bolder;"
+> *Homicídio doloso + Lesão corporal seguida de morte + Latrocínio + Morte por intervenção de agente do Estado. </p>
+"""
+        st.markdown(LV, unsafe_allow_html=True)
+
+    elif TITULOM == "Homicídio Culposo (Trânsito)*":
+        LV = """
+<p style="color:DimGrey; font-size: 14px; font-weight: bolder;"
+> *Atropelamento + colisão + outros. </p>
+"""
+        st.markdown(LV, unsafe_allow_html=True)
+
+    return TITULOOCORRENCIA, TITULOREGIAO, TITULOM
+
+
+def PypigraphicRegiao(titulo, regiao):
+    """
+    Função para criar os gráficos(Barras | Heatmap) para a Regiaão.
+    """
+
+    # CSS espaçamento entre os gráficos
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stVerticalBlock"] {
+        padding-right: 60px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    TITULO = titulo
+    REGIAO = regiao
+
+    # Colunas dos graficos
+    (col1, col2, col3) = st.columns([1, 1, 1])
+
+    # Grafico de barras | Total de ocorrências por ano e município
+    TOTALANOMUNICIPIODF = duckdb.query(
+        f"""SELECT ano AS Ano, SUM({TITULO}) AS Total
+        FROM '{PATH_PARQUET}'
+        WHERE regiao = '{REGIAO}'
+        GROUP BY ano"""
+    ).to_df()
+
+    TOTALANOMUNICIPIODF["Total_fmt"] = TOTALANOMUNICIPIODF["Total"].apply(
+        lambda x: f"{x:,.0f}".replace(",", ".")
+    )
+
+    MEDIAMUNICIPIODF = TOTALANOMUNICIPIODF["Total"].mean()
+    x_scale = alt.Scale(domain=[0, TOTALANOMUNICIPIODF["Total"].max() * 1.1])
+
+    chart = (
+        alt.Chart(TOTALANOMUNICIPIODF)
+        .mark_bar(color="#3CB371")
+        .encode(
+            x=alt.X(
+                "Total:Q",
+                axis=alt.Axis(
+                    title="Total de Ocorrências",
+                    format=",.0f",
+                    labelExpr="replace(datum.label, ',', '.')",
+                    labelFontSize=14,
+                    titleFontSize=18,
+                ),
+            ),
+            y=alt.Y(
+                "Ano:O",
+                sort=None,
+                axis=alt.Axis(
+                    labelFontSize=14,
+                    titleFontSize=18,
+                ),
+            ),
+        )
+        + alt.Chart(TOTALANOMUNICIPIODF)
+        .mark_text(
+            align="right",
+            baseline="middle",
+            dx=0,
+            color="black",
+            fontSize=14,
+        )
+        .encode(
+            x="Total:Q",
+            y=alt.Y("Ano:O", sort=None),
+            text=alt.Text("Total_fmt:N"),
+        )
+        + alt.Chart(pd.DataFrame({"media": [MEDIAMUNICIPIODF]}))
+        .mark_rule(
+            color="#d62728",
+            strokeWidth=2,
+            strokeDash=[5, 5],
+        )
+        .encode(x=alt.X("media:Q", scale=x_scale, title=""))
+        + alt.Chart(pd.DataFrame({"media": [MEDIAMUNICIPIODF]}))
+        .mark_text(
+            text=f"Média de Ocorrências: {MEDIAMUNICIPIODF:,.0f}".replace(",", "."),
+            color="#d62728",
+            fontSize=14,
+            dx=0,
+            dy=-10,
+        )
+        .encode(
+            x=alt.X("media:Q", scale=x_scale, title=""),
+            y=alt.value(0),
+        )
+    ).properties(height=400, width=800)
+
+    col1.altair_chart(chart, width="content", key="chart4")
+
+
+def PypiMetricsRegiao(titulo, municipio, titulo2):
     """
     Função para criar as métricas do dashboard.
     """
 
     TITULO = titulo
-    TITULOOCORRENCIA = tituloocorrencia
+    REGIAO = municipio
+    TITULO2 = titulo2
 
     T = f"""
     <p style="
     font-size: 20px;
     font-weight: bolder;"
 > 📋​Comparativo Anual de Ocorrências |
-        <span style="color:#d62728">{TITULO.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
+        <span style="color:#d62728">{TITULO2.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
     """
     st.markdown(T, unsafe_allow_html=True)
 
     col1, col2, col3, col4, col5 = st.columns((1, 1, 1, 1, 1))
 
     TOTALOC2020 = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
+        f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
-        WHERE ano = '2020'
+        WHERE ano = '2020' AND regiao = '{REGIAO}'
         """
     ).to_df()
 
     TOTALOC2021 = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
+        f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
-        WHERE ano = '2021'
+        WHERE ano = '2021' AND regiao = '{REGIAO}'
         """
     ).to_df()
 
-    DIFFOC2021 = (TOTALOC2020 / TOTALOC2021) - 1
+    DIFFOC2021 = (TOTALOC2021 / TOTALOC2020) - 1
 
     col5.metric(
         label="⌛Total de Ocorrências em 2021:",
@@ -794,9 +1091,9 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
     )
 
     TOTALOC2022 = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
+        f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
-        WHERE ano = '2022'
+        WHERE ano = '2022' AND regiao = '{REGIAO}'
         """
     ).to_df()
 
@@ -809,9 +1106,9 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
     )
 
     TOTALOC2023 = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
+        f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
-        WHERE ano = '2023'
+        WHERE ano = '2023' AND regiao = '{REGIAO}'
         """
     ).to_df()
 
@@ -824,9 +1121,9 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
     )
 
     TOTALOC2024 = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
+        f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
-        WHERE ano = '2024'
+        WHERE ano = '2024' AND regiao = '{REGIAO}'
         """
     ).to_df()
 
@@ -839,9 +1136,9 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
     )
 
     TOATALOC2025 = duckdb.query(
-        f"""SELECT SUM({TITULOOCORRENCIA})
+        f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
-        WHERE ano = '2025'
+        WHERE ano = '2025' AND regiao = '{REGIAO}'
         """
     ).to_df()
 
@@ -913,7 +1210,9 @@ def main():
         PypiMetricsMunicipio(resulttitulo, resultocorrencia, resulttitulo2)
 
     with aba3:
-        ...
+        resulttitulo, resultocorrencia, resulttitulo2 = PypiInfoRegiao()
+        PypigraphicRegiao(resulttitulo, resultocorrencia)
+        PypiMetricsRegiao(resulttitulo, resultocorrencia, resulttitulo2)
 
 
 if __name__ == "__main__":

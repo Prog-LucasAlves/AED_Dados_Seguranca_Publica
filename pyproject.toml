@@ -1,31 +1,15 @@
-[tool.poetry]
+[project]
 name = "aed-dados-seguranca-publica"
 version = "0.1.0"
-description = ""
-authors = ["Prog-LucasAlves <lucasalves_taz@hotmail.com>"]
+description = "Add your description here"
 readme = "README.md"
+requires-python = ">=3.11.5"
+dependencies = [
+    "duckdb>=1.4.3",
+    "streamlit>=1.53.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-pandas = "^2.2.1"
-openpyxl = "^3.1.2"
-pyarrow = "^17.0.0"
-fastparquet = "^2024.5.0"
-streamlit = "^1.37.1"
-duckdb = "^1.0.0"
-folium = "^0.17.0"
-streamlit-folium = "^0.22.0"
-streamlit-extras = "^0.4.7"
-
-
-[tool.poetry.group.dev.dependencies]
-ipykernel = "^6.29.3"
-taskipy = "^1.13.0"
-pre-commit = "^3.8.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.taskipy.tasks]
-run = "streamlit run app.py"
+[dependency-groups]
+dev = [
+    "pre-commit>=4.5.1",
+]
