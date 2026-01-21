@@ -247,7 +247,7 @@ def PypigraphicGeral(tituloocorrencia):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, use_container_width=True, key="chart1")
+    col1.altair_chart(chart, width="content", key="chart1")
 
     # Grafico de heatmap | Total de ocorrências por mes e ano
 
@@ -321,7 +321,7 @@ def PypigraphicGeral(tituloocorrencia):
         .properties(height=400, width=800)
     )
 
-    col2.altair_chart(chart, use_container_width=True, key="chart2")
+    col2.altair_chart(chart, width="content", key="chart2")
 
     # Grafico de linha  | Total de ocorrências por mes e ano
 
@@ -355,7 +355,7 @@ def PypigraphicGeral(tituloocorrencia):
         .properties(height=400, width=800)
     )
 
-    col3.altair_chart(chart, use_container_width=True, key="chart3")
+    col3.altair_chart(chart, width="content", key="chart3")
 
     st.divider()
 
@@ -518,22 +518,23 @@ def PypiInfoMunicipio():
     TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
 
     # Selectbox Município
-    MUNICIPIODFM = duckdb.query(
-        f"""SELECT DISTINCT descricao
-        FROM '{PATH_MUNICIPIOS}'
-        ORDER BY descricao"""
-    ).to_df()
+    MUNICIPIODFM = duckdb.query(f"""
+        SELECT DISTINCT descricao
+        FROM read_csv(
+            '{PATH_MUNICIPIOS}',
+            delim=';',
+            header=true,
+            strict_mode=false,
+            ignore_errors=true,
+            encoding='utf-8'
+        )
+        ORDER BY descricao
+    """).to_df()
 
     MUNICIPIOM = col2.selectbox("​🗺️​Município:", MUNICIPIODFM["descricao"], key="T3")
 
     # Titulo do município
-    MUNICIPIOOCORRENCIADF = duckdb.query(
-        f"""SELECT DISTINCT tipo_ocorrencia
-        FROM '{PATH_MUNICIPIOS}'
-        WHERE descricao = '{MUNICIPIOM}'"""
-    ).to_df()
-
-    TITULOMUNICIPIO = MUNICIPIOOCORRENCIADF.iloc[0, 0]
+    TITULOMUNICIPIO = MUNICIPIOM
 
     # Observação sobre o título da ocorrência
     if TITULOM == "Crimes Violentos Letais Intencionais*":
@@ -655,7 +656,7 @@ def PypigraphicMunicipio(titulo, municipio):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, use_container_width=True, key="chart4")
+    col1.altair_chart(chart, width="content", key="chart4")
 
     # Grafico de heatmap | Total de ocorrências por mes e ano
     TOTALANOMESMUNICIPIODF = duckdb.query(
@@ -728,7 +729,7 @@ def PypigraphicMunicipio(titulo, municipio):
         .properties(height=400, width=800)
     )
 
-    col2.altair_chart(chart, use_container_width=True, key="chart5")
+    col2.altair_chart(chart, width="content", key="chart5")
 
     chart = (
         alt.Chart(TOTALANOMESMUNICIPIODF)
@@ -751,7 +752,7 @@ def PypigraphicMunicipio(titulo, municipio):
         )
     ).properties(width=800, height=400)
 
-    col3.altair_chart(chart, use_container_width=True, key="chart6")
+    col3.altair_chart(chart, width="content", key="chart6")
 
 
 def PypiMetricsMunicipio(titulo, municipio, titulo2):
@@ -922,13 +923,7 @@ def PypiInfoRegiao():
     REGIAOM = col2.selectbox("​🗺️​Região:", REGIAODFM, key="T5")
 
     # Titulo do município
-    REGIAOOCORRENCIADF = duckdb.query(
-        f"""SELECT DISTINCT tipo_ocorrencia
-        FROM '{PATH_REGIOES}'
-        WHERE descricao = '{REGIAOM}'"""
-    ).to_df()
-
-    TITULOREGIAO = REGIAOOCORRENCIADF.iloc[0, 0]
+    TITULOREGIAO = REGIAOM
 
     # Observação sobre o título da ocorrência
     if TITULOM == "Crimes Violentos Letais Intencionais*":
@@ -1050,7 +1045,7 @@ def PypigraphicRegiao(titulo, regiao):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, use_container_width=True, key="chart4")
+    col1.altair_chart(chart, width="content", key="chart4")
 
 
 def PypiMetricsRegiao(titulo, municipio, titulo2):
