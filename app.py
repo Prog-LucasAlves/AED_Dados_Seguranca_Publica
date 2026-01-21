@@ -247,7 +247,7 @@ def PypigraphicGeral(tituloocorrencia):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, width="content", key="chart1")
+    col1.altair_chart(chart, use_container_width=True, key="chart1")
 
     # Grafico de heatmap | Total de ocorrências por mes e ano
 
@@ -321,7 +321,7 @@ def PypigraphicGeral(tituloocorrencia):
         .properties(height=400, width=800)
     )
 
-    col2.altair_chart(chart, width="content", key="chart2")
+    col2.altair_chart(chart, use_container_width=True, key="chart2")
 
     # Grafico de linha  | Total de ocorrências por mes e ano
 
@@ -355,7 +355,7 @@ def PypigraphicGeral(tituloocorrencia):
         .properties(height=400, width=800)
     )
 
-    col3.altair_chart(chart, width="content", key="chart3")
+    col3.altair_chart(chart, use_container_width=True, key="chart3")
 
     st.divider()
 
@@ -656,7 +656,7 @@ def PypigraphicMunicipio(titulo, municipio):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, width="content", key="chart4")
+    col1.altair_chart(chart, use_container_width=True, key="chart4")
 
     # Grafico de heatmap | Total de ocorrências por mes e ano
     TOTALANOMESMUNICIPIODF = duckdb.query(
@@ -672,7 +672,7 @@ def PypigraphicMunicipio(titulo, municipio):
     )
     MAXTOTAL = TOTALANOMESMUNICIPIODF["Total"].max()
     BINS = list(range(0, int(MAXTOTAL + 1000), 50))
-    LABELS = [f"{i+1} - {i+50}" if i > 0 else "0 - 50" for i in BINS[:-1]]
+    LABELS = [f"{i + 1} - {i + 50}" if i > 0 else "0 - 50" for i in BINS[:-1]]
 
     TOTALANOMESMUNICIPIODF["Total_bin"] = pd.cut(
         TOTALANOMESMUNICIPIODF["Total"], bins=BINS, labels=LABELS, include_lowest=True
@@ -729,7 +729,7 @@ def PypigraphicMunicipio(titulo, municipio):
         .properties(height=400, width=800)
     )
 
-    col2.altair_chart(chart, width="content", key="chart5")
+    col2.altair_chart(chart, use_container_width=True, key="chart5")
 
     chart = (
         alt.Chart(TOTALANOMESMUNICIPIODF)
@@ -752,7 +752,7 @@ def PypigraphicMunicipio(titulo, municipio):
         )
     ).properties(width=800, height=400)
 
-    col3.altair_chart(chart, width="content", key="chart6")
+    col3.altair_chart(chart, use_container_width=True, key="chart6")
 
 
 def PypiMetricsMunicipio(titulo, municipio, titulo2):
@@ -1045,7 +1045,7 @@ def PypigraphicRegiao(titulo, regiao):
         )
     ).properties(height=400, width=800)
 
-    col1.altair_chart(chart, width="content", key="chart4")
+    col1.altair_chart(chart, use_container_width=True, key="chart4")
 
 
 def PypiMetricsRegiao(titulo, municipio, titulo2):
