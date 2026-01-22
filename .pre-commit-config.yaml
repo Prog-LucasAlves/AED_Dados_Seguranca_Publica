@@ -8,6 +8,8 @@ repos:
     -   id: check-toml
     -   id: check-merge-conflict
     -   id: check-case-conflict
+    -   id: requirements-txt-fixer
+    -   id: check-added-large-files
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.13
     hooks:
@@ -24,8 +26,8 @@ repos:
     rev: v1.5.0
     hooks:
     -   id: detect-secrets
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+        args: ['--baseline', '.secrets.baseline']
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v4.0.0
     hooks:
-    -   id: check-added-large-files
-        args: ["--maxkb=500"]
+    -   id: add-trailing-comma
