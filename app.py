@@ -65,7 +65,7 @@ def PypiAttData():
     DATA = duckdb.query(
         f"""SELECT mes_nome, mes, ano
         FROM '{PATH_PARQUET}'
-        ORDER BY ano DESC, mes DESC"""
+        ORDER BY ano DESC, mes DESC""",
     ).to_df()
 
     DATAATTMES = DATA.iloc[0, 0]
@@ -117,7 +117,7 @@ def PypiInfoGeral():
     TITULODF = duckdb.query(
         f"""SELECT descricao
         FROM '{PATH_DESCRIPTIONS}'
-        ORDER BY descricao"""
+        ORDER BY descricao""",
     ).to_df()
     TITULO = col1.selectbox("​📝​Título da Ocorrência:", TITULODF["descricao"], key="T1")
 
@@ -125,7 +125,7 @@ def PypiInfoGeral():
     TITULOOCORRENCIADF = duckdb.query(
         f"""SELECT tipo_ocorrencia
         FROM '{PATH_DESCRIPTIONS}'
-        WHERE descricao = '{TITULO}'"""
+        WHERE descricao = '{TITULO}'""",
     ).to_df()
     TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
 
@@ -181,11 +181,11 @@ def PypigraphicGeral(tituloocorrencia):
         f"""SELECT ano AS Ano, SUM({TITULOOCORRENCIA}) AS Total
         FROM '{PATH_PARQUET}'
         GROUP BY ano
-        ORDER BY ano"""
+        ORDER BY ano""",
     ).to_df()
 
     TOTALANODF["Total_fmt"] = TOTALANODF["Total"].apply(
-        lambda x: f"{x:,.0f}".replace(",", ".")
+        lambda x: f"{x:,.0f}".replace(",", "."),
     )
     MEDIAMESDF = TOTALANODF["Total"].mean()
     x_scale = alt.Scale(domain=[0, TOTALANODF["Total"].max() * 1.1])
@@ -255,11 +255,11 @@ def PypigraphicGeral(tituloocorrencia):
         f"""SELECT mes, ano, SUM({TITULOOCORRENCIA}) AS Total
         FROM '{PATH_PARQUET}'
         GROUP BY mes, ano
-        ORDER BY ano, mes"""
+        ORDER BY ano, mes""",
     ).to_df()
 
     TOTALMESANODF["Total_fmt"] = TOTALMESANODF["Total"].apply(
-        lambda x: f"{x:,.0f}".replace(",", ".")
+        lambda x: f"{x:,.0f}".replace(",", "."),
     )
     TOTALMESANODF["Total_bin"] = pd.cut(
         TOTALMESANODF["Total"],
@@ -323,39 +323,62 @@ def PypigraphicGeral(tituloocorrencia):
 
     col2.altair_chart(chart, use_container_width=True, key="chart2")
 
-    # Grafico de linha  | Total de ocorrências por mes e ano
+    #################
+
+    # Calcular desvio em relação à média
+    TOTALANODF["Desvio"] = TOTALANODF["Total"] - MEDIAMESDF
+
+    TOTALANODF["Desvio_fmt"] = TOTALANODF["Desvio"].apply(
+        lambda x: f"{x:+,.0f}".replace(",", "."),
+    )
 
     chart = (
-        alt.Chart(TOTALMESANODF)
-        .mark_line(point=True)
+        alt.Chart(TOTALANODF)
+        .mark_bar()
         .encode(
             x=alt.X(
-                "mes:O",
-                title="Mês",
+                "Desvio:Q",
+                title="Desvio em Relação à Média",
                 axis=alt.Axis(
-                    labelAngle=0,
+                    format=",.0f",
+                    labelExpr="replace(datum.label, ',', '.')",
                     labelFontSize=14,
                     titleFontSize=18,
                 ),
             ),
             y=alt.Y(
-                "Total:Q",
-                title="Total de Ocorrências",
+                "Ano:O",
+                sort=None,
                 axis=alt.Axis(
-                    format=",.0f",
-                    labelExpr="replace(datum.label, ',', '.')",
-                    formatType="number",
                     labelFontSize=14,
                     titleFontSize=18,
                 ),
             ),
-            color=alt.Color("ano:O", title="Ano", scale=alt.Scale(scheme="greens")),
-            tooltip=["ano", "mes", "Total"],
+            color=alt.condition(
+                alt.datum.Desvio >= 0,
+                alt.value("#3cb371"),  # acima da média
+                alt.value("#b33c3c"),  # abaixo da média
+            ),
         )
-        .properties(height=400, width=800)
-    )
+        + alt.Chart(TOTALANODF)
+        .mark_text(
+            align="left",
+            baseline="middle",
+            dx=5,
+            fontSize=14,
+            color="black",
+        )
+        .encode(
+            x="Desvio:Q",
+            y=alt.Y("Ano:O", sort=None),
+            text=alt.Text("Desvio_fmt:N"),
+        )
+        + alt.Chart(pd.DataFrame({"zero": [0]}))
+        .mark_rule(strokeWidth=2, color="black")
+        .encode(x="zero:Q")
+    ).properties(height=400, width=800)
 
-    col3.altair_chart(chart, use_container_width=True, key="chart3")
+    col3.altair_chart(chart, use_container_width=True, key="chart4")
 
     st.divider()
 
@@ -372,8 +395,8 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
     <p style="
     font-size: 20px;
     font-weight: bolder;"
-> 📋​Comparativo Anual de Ocorrências |
-        <span style="color:#d62728">{TITULO.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
+> 📋​Comparativo Anual de Ocorrências -
+        <span style="color:#d62728">{TITULO.upper()}:</span> 2025 | 2024 | 2023 | 2022 | 2021 </p>
     """
     st.markdown(T, unsafe_allow_html=True)
 
@@ -383,14 +406,14 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
         f"""SELECT SUM({TITULOOCORRENCIA})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2020'
-        """
+        """,
     ).to_df()
 
     TOTALOC2021 = duckdb.query(
         f"""SELECT SUM({TITULOOCORRENCIA})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2021'
-        """
+        """,
     ).to_df()
 
     DIFFOC2021 = (TOTALOC2020 / TOTALOC2021) - 1
@@ -405,7 +428,7 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
         f"""SELECT SUM({TITULOOCORRENCIA})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2022'
-        """
+        """,
     ).to_df()
 
     DIFFOC2122 = (TOTALOC2022 / TOTALOC2021) - 1
@@ -420,7 +443,7 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
         f"""SELECT SUM({TITULOOCORRENCIA})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2023'
-        """
+        """,
     ).to_df()
 
     DIFFOC2322 = (TOTALOC2023 / TOTALOC2022) - 1
@@ -435,7 +458,7 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
         f"""SELECT SUM({TITULOOCORRENCIA})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2024'
-        """
+        """,
     ).to_df()
 
     DIFFOC2423 = (TOTALOC2024 / TOTALOC2023) - 1
@@ -450,7 +473,7 @@ def PypiMetricsGeral(titulo, tituloocorrencia):
         f"""SELECT SUM({TITULOOCORRENCIA})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2025'
-        """
+        """,
     ).to_df()
 
     DIFFOC2524 = (TOATALOC2025 / TOTALOC2024) - 1
@@ -502,17 +525,19 @@ def PypiInfoMunicipio():
     TITULODFM = duckdb.query(
         f"""SELECT descricao
         FROM '{PATH_DESCRIPTIONS}'
-        ORDER BY descricao"""
+        ORDER BY descricao""",
     ).to_df()
     TITULOM = col1.selectbox(
-        "​📝​Título da Ocorrência:", TITULODFM["descricao"], key="T2"
+        "​📝​Título da Ocorrência:",
+        TITULODFM["descricao"],
+        key="T2",
     )
 
     # Título das ocorrências
     TITULOOCORRENCIADF = duckdb.query(
         f"""SELECT tipo_ocorrencia
         FROM '{PATH_DESCRIPTIONS}'
-        WHERE descricao = '{TITULOM}'"""
+        WHERE descricao = '{TITULOM}'""",
     ).to_df()
 
     TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
@@ -589,11 +614,11 @@ def PypigraphicMunicipio(titulo, municipio):
         f"""SELECT ano AS Ano, SUM({TITULO}) AS Total
         FROM '{PATH_PARQUET}'
         WHERE fmun = '{MUNICIPIO}'
-        GROUP BY ano"""
+        GROUP BY ano""",
     ).to_df()
 
     TOTALANOMUNICIPIODF["Total_fmt"] = TOTALANOMUNICIPIODF["Total"].apply(
-        lambda x: f"{x:,.0f}".replace(",", ".")
+        lambda x: f"{x:,.0f}".replace(",", "."),
     )
 
     MEDIAMUNICIPIODF = TOTALANOMUNICIPIODF["Total"].mean()
@@ -664,25 +689,28 @@ def PypigraphicMunicipio(titulo, municipio):
         FROM '{PATH_PARQUET}'
         WHERE fmun = '{MUNICIPIO}'
         GROUP BY mes, ano
-        ORDER BY ano, mes"""
+        ORDER BY ano, mes""",
     ).to_df()
 
     TOTALANOMESMUNICIPIODF["Total_fmt"] = TOTALANOMESMUNICIPIODF["Total"].apply(
-        lambda x: f"{x:,.0f}".replace(",", ".")
+        lambda x: f"{x:,.0f}".replace(",", "."),
     )
     MAXTOTAL = TOTALANOMESMUNICIPIODF["Total"].max()
     BINS = list(range(0, int(MAXTOTAL + 1000), 50))
     LABELS = [f"{i + 1} - {i + 50}" if i > 0 else "0 - 50" for i in BINS[:-1]]
 
     TOTALANOMESMUNICIPIODF["Total_bin"] = pd.cut(
-        TOTALANOMESMUNICIPIODF["Total"], bins=BINS, labels=LABELS, include_lowest=True
+        TOTALANOMESMUNICIPIODF["Total"],
+        bins=BINS,
+        labels=LABELS,
+        include_lowest=True,
     )
 
     TOTALANOMESMUNICIPIODF["Total_bin"] = TOTALANOMESMUNICIPIODF[
         "Total_bin"
     ].cat.add_categories("Fora do intervalo")
     TOTALANOMESMUNICIPIODF["Total_bin"] = TOTALANOMESMUNICIPIODF["Total_bin"].fillna(
-        "Fora do intervalo"
+        "Fora do intervalo",
     )
 
     chart = (
@@ -768,8 +796,8 @@ def PypiMetricsMunicipio(titulo, municipio, titulo2):
     <p style="
     font-size: 20px;
     font-weight: bolder;"
-> 📋​Comparativo Anual de Ocorrências |
-        <span style="color:#d62728">{TITULO2.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
+> 📋​Comparativo Anual de Ocorrências -
+        <span style="color:#d62728">{TITULO2.upper()}:</span> 2025 | 2024 | 2023 | 2022 | 2021 </p>
     """
     st.markdown(T, unsafe_allow_html=True)
 
@@ -779,14 +807,14 @@ def PypiMetricsMunicipio(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2020' AND fmun = '{MUNICIPIO}'
-        """
+        """,
     ).to_df()
 
     TOTALOC2021 = duckdb.query(
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2021' AND fmun = '{MUNICIPIO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2021 = (TOTALOC2021 / TOTALOC2020) - 1
@@ -801,7 +829,7 @@ def PypiMetricsMunicipio(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2022' AND fmun = '{MUNICIPIO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2122 = (TOTALOC2022 / TOTALOC2021) - 1
@@ -816,7 +844,7 @@ def PypiMetricsMunicipio(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2023' AND fmun = '{MUNICIPIO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2322 = (TOTALOC2023 / TOTALOC2022) - 1
@@ -831,7 +859,7 @@ def PypiMetricsMunicipio(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2024' AND fmun = '{MUNICIPIO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2423 = (TOTALOC2024 / TOTALOC2023) - 1
@@ -846,7 +874,7 @@ def PypiMetricsMunicipio(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2025' AND fmun = '{MUNICIPIO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2524 = (TOATALOC2025 / TOTALOC2024) - 1
@@ -898,17 +926,19 @@ def PypiInfoRegiao():
     TITULODFM = duckdb.query(
         f"""SELECT descricao
         FROM '{PATH_DESCRIPTIONS}'
-        ORDER BY descricao"""
+        ORDER BY descricao""",
     ).to_df()
     TITULOM = col1.selectbox(
-        "​📝​Título da Ocorrência:", TITULODFM["descricao"], key="T4"
+        "​📝​Título da Ocorrência:",
+        TITULODFM["descricao"],
+        key="T4",
     )
 
     # Título das ocorrências
     TITULOOCORRENCIADF = duckdb.query(
         f"""SELECT tipo_ocorrencia
         FROM '{PATH_DESCRIPTIONS}'
-        WHERE descricao = '{TITULOM}'"""
+        WHERE descricao = '{TITULOM}'""",
     ).to_df()
 
     TITULOOCORRENCIA = TITULOOCORRENCIADF.iloc[0, 0]
@@ -917,7 +947,7 @@ def PypiInfoRegiao():
     REGIAODFM = duckdb.query(
         f"""SELECT DISTINCT descricao
         FROM '{PATH_REGIOES}'
-        ORDER BY descricao"""
+        ORDER BY descricao""",
     ).to_df()
 
     REGIAOM = col2.selectbox("​🗺️​Região:", REGIAODFM, key="T5")
@@ -978,11 +1008,11 @@ def PypigraphicRegiao(titulo, regiao):
         f"""SELECT ano AS Ano, SUM({TITULO}) AS Total
         FROM '{PATH_PARQUET}'
         WHERE regiao = '{REGIAO}'
-        GROUP BY ano"""
+        GROUP BY ano""",
     ).to_df()
 
     TOTALANOMUNICIPIODF["Total_fmt"] = TOTALANOMUNICIPIODF["Total"].apply(
-        lambda x: f"{x:,.0f}".replace(",", ".")
+        lambda x: f"{x:,.0f}".replace(",", "."),
     )
 
     MEDIAMUNICIPIODF = TOTALANOMUNICIPIODF["Total"].mean()
@@ -1061,8 +1091,8 @@ def PypiMetricsRegiao(titulo, municipio, titulo2):
     <p style="
     font-size: 20px;
     font-weight: bolder;"
-> 📋​Comparativo Anual de Ocorrências |
-        <span style="color:#d62728">{TITULO2.upper()}</span> | : 2025 | 2024 | 2023 | 2022 | 2021 </p>
+> 📋​Comparativo Anual de Ocorrências -
+        <span style="color:#d62728">{TITULO2.upper()}:</span> 2025 | 2024 | 2023 | 2022 | 2021 </p>
     """
     st.markdown(T, unsafe_allow_html=True)
 
@@ -1072,14 +1102,14 @@ def PypiMetricsRegiao(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2020' AND regiao = '{REGIAO}'
-        """
+        """,
     ).to_df()
 
     TOTALOC2021 = duckdb.query(
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2021' AND regiao = '{REGIAO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2021 = (TOTALOC2021 / TOTALOC2020) - 1
@@ -1094,7 +1124,7 @@ def PypiMetricsRegiao(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2022' AND regiao = '{REGIAO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2122 = (TOTALOC2022 / TOTALOC2021) - 1
@@ -1109,7 +1139,7 @@ def PypiMetricsRegiao(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2023' AND regiao = '{REGIAO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2322 = (TOTALOC2023 / TOTALOC2022) - 1
@@ -1124,7 +1154,7 @@ def PypiMetricsRegiao(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2024' AND regiao = '{REGIAO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2423 = (TOTALOC2024 / TOTALOC2023) - 1
@@ -1139,7 +1169,7 @@ def PypiMetricsRegiao(titulo, municipio, titulo2):
         f"""SELECT SUM({TITULO})
         FROM '{PATH_PARQUET}'
         WHERE ano = '2025' AND regiao = '{REGIAO}'
-        """
+        """,
     ).to_df()
 
     DIFFOC2524 = (TOATALOC2025 / TOTALOC2024) - 1
